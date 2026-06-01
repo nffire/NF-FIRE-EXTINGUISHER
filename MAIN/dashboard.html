@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NF Fire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: linear-gradient(rgba(15, 15, 17, 0.5), rgba(15, 15, 17, 0.5)), url('assets/IMAGES/backgroundimage.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        body.light-theme {
+            background: linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('assets/IMAGES/backgroundimage.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+<script>
+    // Apply theme immediately if stored, default to light
+    (function() {
+        const savedTheme = localStorage.getItem('sysadmin_theme') || localStorage.getItem('nf_theme');
+        if (savedTheme !== 'dark') {
+            document.body.classList.add('light-theme');
+        }
+    })();
+</script>
+    <div class="container dashboard-container">
+        <div class="glass-panel">
+            <div class="header" style="text-align: left; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1>NF Admin Dashboard</h1>
+                    <p>Welcome back, <span id="adminName" style="color: var(--primary); font-weight: bold;">Admin</span>!</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <button id="themeToggleBtn" onclick="toggleTheme()" class="btn btn-outline" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem; text-transform: none; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">🌓 Theme</button>
+                    <button onclick="logout()" class="btn btn-outline" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;">Logout</button>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <!-- With GST Button -->
+                <a href="../GST-SERVER-MANAGEMENT/index.html" class="dashboard-card">
+                    <div class="icon">🧾</div>
+                    <h3>With GST</h3>
+                </a>
+
+                <!-- Without GST Button -->
+                <a href="../WGST-SERVER-MANAGEMENT/index.html" class="dashboard-card">
+                    <div class="icon">📄</div>
+                    <h3>Without GST</h3>
+                </a>
+
+                <!-- Inventory Management Button -->
+                <a href="../INVENTNF/index.html" class="dashboard-card">
+                    <div class="icon">📦</div>
+                    <h3>Inventory Management</h3>
+                </a>
+
+                <!-- System Administrator Button -->
+                <a href="sysadmin_login.html" class="dashboard-card" style="border-color: #ffaa00;">
+                    <div class="icon">⚙️</div>
+                    <h3 style="color: #ffaa00;">System Admin</h3>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+    console.log("REDIRECT ON THE NF ADMIN DASHBOARD");
+</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Theme button state (defaults to light theme)
+            const savedTheme = localStorage.getItem('sysadmin_theme') || localStorage.getItem('nf_theme') || 'light';
+            updateThemeButton(savedTheme !== 'dark');
+
+            const dataStr = localStorage.getItem('admin_data') || sessionStorage.getItem('admin_data');
+            if (dataStr) {
+                try {
+                    const data = JSON.parse(dataStr);
+                    if (data.name) {
+                        document.getElementById('adminName').textContent = data.name;
+                    }
+                } catch (e) {
+                    console.error("Error parsing session data");
+                }
+            } else {
+                // If they bypassed login, force redirect to login
+                window.location.replace('index.html');
+            }
+        });
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light-theme');
+            localStorage.setItem('sysadmin_theme', isLight ? 'light' : 'dark');
+            localStorage.setItem('nf_theme', isLight ? 'light' : 'dark');
+            updateThemeButton(isLight);
+        }
+
+        function updateThemeButton(isLight) {
+            const btn = document.getElementById('themeToggleBtn');
+            if (!btn) return;
+            btn.innerHTML = isLight ? '☀️ Light' : '🌙 Dark';
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_data');
+            sessionStorage.removeItem('admin_data');
+            window.location.replace('index.html');
+        }
+    </script>
+</body>
+</html>

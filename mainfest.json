@@ -1,0 +1,15 @@
+{
+  "name": "Fire Shield Tracker",
+  "short_name": "FireShield",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f4f4f4",
+  "theme_color": "#d32f2f",
+  "icons": [
+    {
+      "src": "demo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

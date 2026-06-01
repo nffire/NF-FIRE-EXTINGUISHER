@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NF Fire Extinguisher</title>
+  
+  <!-- Added the SEO Tags -->
+  <meta name="description" content="NF Fire Extinguisher Admin Center - Comprehensive Fire Safety and Inventory Management System">
+  <meta name="keywords" content="NF Fire, Fire Extinguisher, Fire Safety, Admin Center, Inventory Management">
+  <meta name="author" content="Harshad Teli">
+  <meta name="author" content="harshadteli697@gmail.com">
+  <meta name="robots" content="index,follow">
+  <meta name="language" content="English">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="Mobileoptimized" content="320">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="NF Fire Extinguisher Admin Center">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="https://nffire.github.io/NF-FIRE-EXTINGUISHER/Logo.jpg">
+  <meta property="og:site_name" content="NF Fire">
+
+  <!-- Apple Meta Tags -->
+  <meta name="apple-mobile-web-title" content="NF Fire Admin">
+  <meta name="apple-mobile-web-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="https://nffire.github.io/NF-FIRE-EXTINGUISHER/Logo.jpg">
+
+  <link rel="shortcut icon" href="https://nffire.github.io/NF-FIRE-EXTINGUISHER/Logo.jpg" type="image/x-icon" />
+  <link rel="icon" href="https://nffire.github.io/NF-FIRE-EXTINGUISHER/Logo.jpg" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="admin.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Maximize window immediately when launched as desktop app via Edge --app mode
+    (function() {
+      try {
+        window.moveTo(0, 0);
+        window.resizeTo(screen.width, screen.height);
+      } catch(e) {}
+    })();
+    // Also attempt true fullscreen on first user gesture
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        window.moveTo(0, 0);
+        window.resizeTo(screen.width, screen.height);
+      } catch(e) {}
+    });
+  </script>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- FULL-SCREEN LOADING OVERLAY                   -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div id="appLoadingOverlay">
+    <div class="spinner-card">
+      <div class="spinner-logo">🔥</div>
+      <div class="spinner-ring"></div>
+      <div class="spinner-title">NF Fire Admin</div>
+      <div class="spinner-sub" id="loadingMsg">Initialising system...</div>
+      <div class="spinner-progress">
+        <div class="spinner-progress-bar" id="loadingBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Backdrop for Mobile -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🔥</span>
+        <div>
+          <div class="logo-title">NF Fire</div>
+          <div class="logo-sub">Admin Center</div>
+        </div>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Close sidebar">&#10005;</button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">OVERVIEW</div>
+      <a href="#" class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">⊞</span><span class="nav-label">Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-page="analytics">
+        <span class="nav-icon">📊</span><span class="nav-label">Analytics</span>
+      </a>
+
+      <div class="nav-section">OPERATIONS</div>
+      <a href="#" class="nav-item" data-page="sales">
+        <span class="nav-icon">💰</span><span class="nav-label">Sales Pipeline</span>
+        <span class="nav-badge" id="salesBadge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-page="inventory">
+        <span class="nav-icon">📦</span><span class="nav-label">Inventory</span>
+        <span class="nav-badge danger" id="invBadge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-page="quotes">
+        <span class="nav-icon">📋</span><span class="nav-label">Quotes & Orders</span>
+      </a>
+      <a href="#" class="nav-item" data-page="vendors">
+        <span class="nav-icon">🏭</span><span class="nav-label">Vendors</span>
+      </a>
+      <a href="#" class="nav-item" data-page="parties">
+        <span class="nav-icon">🤝</span><span class="nav-label">Parties</span>
+      </a>
+
+      <div class="nav-section">INTELLIGENCE</div>
+      <a href="#" class="nav-item" data-page="compliance">
+        <span class="nav-icon">&#128737;</span><span class="nav-label">Fire Compliance</span>
+      </a>
+      <a href="#" class="nav-item" data-page="reports">
+        <span class="nav-icon">&#128202;</span><span class="nav-label">Reports</span>
+      </a>
+
+      <div class="nav-section">SYSTEM</div>
+      <a href="#" class="nav-item" data-page="customers">
+        <span class="nav-icon">👥</span><span class="nav-label">Customers</span>
+      </a>
+
+      <a href="#" class="nav-item" data-page="settings">
+        <span class="nav-icon">⚙️</span><span class="nav-label">System Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-info">
+        <div class="admin-avatar">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Super Administrator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main" id="main">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-hamburger" id="topbarHamburger" title="Toggle Menu">&#9776;</button>
+        <div>
+          <h1 class="page-title" id="pageTitle">Dashboard</h1>
+         
+          <span class="breadcrumb">Admin / <span id="breadcrumbPage">Overview</span></span>
+        </div>
+      </div>
+          <marquee>All Data Regarding to the  GST Module</marquee>
+      <div class="topbar-right">
+      
+        <div class="search-box">
+          
+          <span>🔍</span>
+          <input type="text" placeholder="Search anything..." id="globalSearch"/>
+        </div>
+        <button class="btn-icon" title="Reload application" onclick="location.reload()">↻</button>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Light / Dark Theme">
+          <span class="toggle-thumb">
+            <span class="toggle-icon-dark">🌙</span>
+            <span class="toggle-icon-light">☀️</span>
+          </span>
+        </button>
+        <div class="notif-bell" id="notifBell">
+          🔔
+          <span class="notif-dot" id="notifDot"></span>
+        </div>
+        <div id="notifPanel" class="notif-panel"></div>
+        <div class="gas-status" id="gasStatus" style="background: rgba(46, 213, 115, 0.12); border: 1px solid rgba(46, 213, 115, 0.3); color: var(--green);">
+          <span class="status-dot" style="background-color: var(--green);"></span> Standalone Mode
+        </div>
+      </div>
+    </header>
+
+    <!-- Alert Banner -->
+    <div class="alert-banner" id="alertBanner" style="display:none">
+      <span id="alertText"></span>
+      <button onclick="document.getElementById('alertBanner').style.display='none'">✕</button>
+    </div>
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card" id="kpi-revenue">
+          <div class="kpi-icon" style="background:linear-gradient(135deg,#ff6b35,#f7931e)">💰</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Total Revenue</div>
+            <div class="kpi-value" id="kpiRevenue">₹0</div>
+            <div class="kpi-change positive" id="kpiRevenueChange">+0% this month</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-orders">
+          <div class="kpi-icon" style="background:linear-gradient(135deg,#6c63ff,#48cae4)">📦</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Total Orders</div>
+            <div class="kpi-value" id="kpiOrders">0</div>
+            <div class="kpi-change" id="kpiOrdersChange">This month</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-inventory">
+          <div class="kpi-icon" style="background:linear-gradient(135deg,#00b09b,#96c93d)">🏭</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Inventory Items</div>
+            <div class="kpi-value" id="kpiInventory">0</div>
+            <div class="kpi-change danger" id="kpiLowStock">0 low stock alerts</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-customers">
+          <div class="kpi-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c)">👥</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Total Customers</div>
+            <div class="kpi-value" id="kpiCustomers">0</div>
+            <div class="kpi-change positive" id="kpiCustomersChange">+0 new today</div>
+          </div>
+        </div>
+        <div class="kpi-card" id="kpi-pending">
+          <div class="kpi-icon" style="background:linear-gradient(135deg,#fda085,#f6d365)">⏳</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Pending Quotes</div>
+            <div class="kpi-value" id="kpiPending">0</div>
+            <div class="kpi-change" id="kpiPendingChange">Awaiting approval</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Sales Revenue Trend</div>
+              <div class="chart-sub">Last 7 days performance</div>
+            </div>
+            <div class="chart-actions">
+              <button class="chip active" onclick="setChartPeriod('7d',this)">7D</button>
+              <button class="chip" onclick="setChartPeriod('30d',this)">30D</button>
+              <button class="chip" onclick="setChartPeriod('90d',this)">3M</button>
+            </div>
+          </div>
+          <canvas id="revenueChart" height="80"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Sales by Category</div>
+              <div class="chart-sub">Product breakdown</div>
+            </div>
+          </div>
+          <canvas id="categoryChart" height="150"></canvas>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="bottom-row">
+        <!-- Recent Sales -->
+        <div class="table-card">
+          <div class="card-header">
+            <span class="card-title">Recent Sales</span>
+            <button class="btn-link" onclick="switchPage('sales')">View All →</button>
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead><tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody id="recentSalesBody">
+                <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Low Stock Alerts -->
+        <div class="table-card">
+          <div class="card-header">
+            <span class="card-title">⚠️ Low Stock Alerts</span>
+            <button class="btn-link" onclick="switchPage('inventory')">Manage →</button>
+          </div>
+          <div id="lowStockList" class="alert-list">
+            <div class="empty-state">Loading inventory...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: SALES PIPELINE -->
+    <div class="page" id="page-sales">
+      <div class="page-toolbar">
+        <div class="toolbar-filters">
+          <select id="salesStatusFilter" onchange="filterSales()">
+            <option value="">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <input type="date" id="salesDateFrom" onchange="filterSales()"/>
+          <input type="date" id="salesDateTo" onchange="filterSales()"/>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn-secondary" onclick="exportSalesCSV()">⬇ Export CSV</button>
+          <button class="btn-primary" onclick="openAddSaleModal()">+ Add Sale</button>
+        </div>
+      </div>
+
+      <div class="pipeline-stages">
+        <div class="stage" id="stage-pending">
+          <div class="stage-header"><span class="stage-dot pending"></span> Pending <span class="stage-count" id="cnt-pending">0</span></div>
+          <div class="stage-body" id="cards-pending"></div>
+        </div>
+        <div class="stage" id="stage-confirmed">
+          <div class="stage-header"><span class="stage-dot confirmed"></span> Confirmed <span class="stage-count" id="cnt-confirmed">0</span></div>
+          <div class="stage-body" id="cards-confirmed"></div>
+        </div>
+        <div class="stage" id="stage-shipped">
+          <div class="stage-header"><span class="stage-dot shipped"></span> Shipped <span class="stage-count" id="cnt-shipped">0</span></div>
+          <div class="stage-body" id="cards-shipped"></div>
+        </div>
+        <div class="stage" id="stage-cancelled">
+          <div class="stage-header">
+            <span class="stage-dot cancelled"></span> Cancelled 
+            <span class="stage-count" id="cnt-cancelled">0</span>
+            <button class="stage-clear-btn" id="btn-clear-cancelled" onclick="clearCancelledHistory()" title="Clear Cancelled History" style="background:rgba(255,71,87,0.12); border:1px solid rgba(255,71,87,0.3); color:var(--red); cursor:pointer; font-size:.65rem; font-weight:700; padding:.1rem .45rem; border-radius:10px; transition:.2s; display:none; outline:none; margin-left:.5rem;">🗑 Clear</button>
+          </div>
+          <div class="stage-body" id="cards-cancelled"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: INVENTORY -->
+    <div class="page" id="page-inventory">
+      <div class="page-toolbar">
+        <div class="toolbar-filters">
+          <input type="text" id="invSearch" placeholder="Search products..." oninput="filterInventory()"/>
+          <select id="invCategoryFilter" onchange="filterInventory()">
+            <option value="">All Categories</option>
+            <option value="Extinguisher">Extinguisher</option>
+            <option value="Suppression">Suppression</option>
+            <option value="Detection">Detection</option>
+            <option value="PPE">PPE</option>
+            <option value="Accessories">Accessories</option>
+          </select>
+          <select id="invStockFilter" onchange="filterInventory()">
+            <option value="">All Stock</option>
+            <option value="low">Low Stock</option>
+            <option value="out">Out of Stock</option>
+            <option value="ok">In Stock</option>
+          </select>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn-secondary" onclick="exportInventoryCSV()">⬇ Export</button>
+          <button class="btn-primary" onclick="openAddProductModal()">+ Add Product</button>
+        </div>
+      </div>
+
+      <div class="inv-stats-row">
+        <div class="inv-stat"><div class="inv-stat-val" id="invTotal">0</div><div class="inv-stat-lbl">Total SKUs</div></div>
+        <div class="inv-stat"><div class="inv-stat-val ok" id="invInStock">0</div><div class="inv-stat-lbl">In Stock</div></div>
+        <div class="inv-stat"><div class="inv-stat-val warn" id="invLowStock">0</div><div class="inv-stat-lbl">Low Stock</div></div>
+        <div class="inv-stat"><div class="inv-stat-val danger" id="invOutStock">0</div><div class="inv-stat-lbl">Out of Stock</div></div>
+        <div class="inv-stat"><div class="inv-stat-val" id="invValue">₹0</div><div class="inv-stat-lbl">Total Value</div></div>
+      </div>
+
+      <div class="table-card" style="margin-top:1rem">
+        <div class="table-wrapper">
+          <table class="data-table" id="inventoryTable">
+            <thead>
+              <tr>
+                <th>Product Name</th><th>Category</th>
+                <th>Stock Level</th><th>Threshold</th><th>Price</th><th>Supplier</th><th>Last Updated</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryBody">
+              <tr><td colspan="10" class="empty-state">Loading inventory...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: QUOTES & ORDERS -->
+    <div class="page" id="page-quotes">
+      <div class="page-toolbar">
+        <div class="toolbar-filters">
+          <select id="quoteStatusFilter" onchange="filterQuotes()">
+            <option value="">All</option>
+            <option value="Draft">Draft</option>
+            <option value="Sent">Sent</option>
+            <option value="Accepted">Accepted</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn-primary" onclick="openNewQuoteModal()">+ New Quote</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Quote ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="quotesBody">
+            <tr><td colspan="7" class="empty-state">Loading quotes...</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: VENDORS -->
+    <div class="page" id="page-vendors">
+      <div class="page-toolbar">
+        <div class="toolbar-actions">
+          <button class="btn-primary" onclick="openAddVendorModal()">+ Add Vendor</button>
+        </div>
+      </div>
+      <div class="vendor-grid" id="vendorGrid">
+        <div class="empty-state">Loading vendors...</div>
+      </div>
+    </div>
+
+    <!-- PAGE: PARTIES -->
+    <div class="page" id="page-parties">
+      <div class="page-toolbar">
+        <div class="toolbar-filters">
+          <input type="text" id="partySearch" placeholder="Search parties..." oninput="filterParties()"/>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn-primary" onclick="openAddPartyModal()">+ Add Party</button>
+        </div>
+      </div>
+      <div class="table-card" style="margin-top:1rem">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Party Name</th>
+                <th>GSTIN & Type</th>
+                <th>State</th>
+                <th>Contact Information</th>
+                <th style="width:160px; text-align:center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="partiesBody">
+              <tr><td colspan="5" class="empty-state">Loading parties...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <!-- PAGE: FIRE COMPLIANCE -->
+    <div class="page" id="page-compliance">
+      <div class="compliance-grid">
+        <div class="compliance-card">
+          <div class="comp-class">Class A</div>
+          <div class="comp-desc">Ordinary combustibles — wood, paper, fabric, plastic</div>
+          <div class="comp-products" id="compA"></div>
+          <div class="comp-actions" style="margin-top:auto; display:flex; gap:0.5rem; padding-top:1rem;">
+            <button class="tbl-btn" onclick="viewFireClass('A')">&#128065; View</button>
+            <button class="tbl-btn" onclick="editFireClass('A')">&#9999; Edit</button>
+            <button class="tbl-btn danger" onclick="deleteFireClass('A')">&#128465; Clear</button>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="comp-class">Class B</div>
+          <div class="comp-desc">Flammable liquids — petrol, diesel, paint, solvents</div>
+          <div class="comp-products" id="compB"></div>
+          <div class="comp-actions" style="margin-top:auto; display:flex; gap:0.5rem; padding-top:1rem;">
+            <button class="tbl-btn" onclick="viewFireClass('B')">&#128065; View</button>
+            <button class="tbl-btn" onclick="editFireClass('B')">&#9999; Edit</button>
+            <button class="tbl-btn danger" onclick="deleteFireClass('B')">&#128465; Clear</button>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="comp-class">Class C</div>
+          <div class="comp-desc">Electrical equipment — servers, switchgear, motors</div>
+          <div class="comp-products" id="compC"></div>
+          <div class="comp-actions" style="margin-top:auto; display:flex; gap:0.5rem; padding-top:1rem;">
+            <button class="tbl-btn" onclick="viewFireClass('C')">&#128065; View</button>
+            <button class="tbl-btn" onclick="editFireClass('C')">&#9999; Edit</button>
+            <button class="tbl-btn danger" onclick="deleteFireClass('C')">&#128465; Clear</button>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="comp-class">Class D</div>
+          <div class="comp-desc">Metal fires — magnesium, titanium, sodium, potassium</div>
+          <div class="comp-products" id="compD"></div>
+          <div class="comp-actions" style="margin-top:auto; display:flex; gap:0.5rem; padding-top:1rem;">
+            <button class="tbl-btn" onclick="viewFireClass('D')">&#128065; View</button>
+            <button class="tbl-btn" onclick="editFireClass('D')">&#9999; Edit</button>
+            <button class="tbl-btn danger" onclick="deleteFireClass('D')">&#128465; Clear</button>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="comp-class">Class F / K</div>
+          <div class="comp-desc">Cooking oils & fats — commercial kitchens</div>
+          <div class="comp-products" id="compF"></div>
+          <div class="comp-actions" style="margin-top:auto; display:flex; gap:0.5rem; padding-top:1rem;">
+            <button class="tbl-btn" onclick="viewFireClass('F')">&#128065; View</button>
+            <button class="tbl-btn" onclick="editFireClass('F')">&#9999; Edit</button>
+            <button class="tbl-btn danger" onclick="deleteFireClass('F')">&#128465; Clear</button>
+          </div>
+        </div>
+        <div class="compliance-card add-product-compliance">
+          <div class="comp-class">+ Map Product</div>
+          <div class="comp-desc">Assign products to fire classes</div>
+          <button class="btn-primary" onclick="openComplianceMapper()">Open Mapper</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: CUSTOMERS -->
+    <div class="page" id="page-customers">
+      <div class="page-toolbar">
+        <div class="toolbar-filters">
+          <input type="text" id="custSearch" placeholder="Search customers..." oninput="filterCustomers()"/>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn-secondary" onclick="exportCustomersCSV()">⬇ Export</button>
+          <button class="btn-primary" onclick="openAddCustomerModal()">+ Add Customer</button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Total Spent</th><th>Last Order</th><th>Actions</th></tr></thead>
+          <tbody id="customersBody">
+            <tr><td colspan="7" class="empty-state">Loading customers...</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- PAGE: ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="analytics-grid">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Monthly Revenue</div></div>
+          <canvas id="monthlyRevenueChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Top Selling Products</div></div>
+          <canvas id="topProductsChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Inventory Turnover</div></div>
+          <canvas id="turnoverChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">Customer Acquisition</div></div>
+          <canvas id="acquisitionChart" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: SYSTEM SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="settings-grid">
+
+        <div class="settings-card">
+          <div class="settings-title">🤖 Chatbot Configuration</div>
+          <div class="form-group">
+            <label>Gemini API Key</label>
+            <input type="password" id="geminiKey" placeholder="Your Gemini API key"/>
+          </div>
+          <div class="form-group">
+            <label>Bot Greeting</label>
+            <textarea id="botGreeting" rows="3">Hello! I'm NF Fire Assistant. How can I help you today?</textarea>
+          </div>
+          <button class="btn-primary" onclick="saveChatbotConfig()">Save Chatbot Settings</button>
+        </div>
+
+        <!-- ── DATABASE CONNECTION STATUS CARD ─────────────── -->
+        <div class="settings-card db-card">
+          <div class="settings-title">🗄️ Database Connection &amp; Status</div>
+
+          <!-- Live Status Panel -->
+          <div class="db-status-panel">
+            <div class="db-status-indicator">
+              <span>Connection:</span>
+              <span class="db-status-badge unconfigured" id="dbStatusBadge">⚪ Not Configured</span>
+            </div>
+            <div class="db-metrics">
+              <div class="db-metric">
+                <div class="db-metric-val" id="dbLastSync">—</div>
+                <div class="db-metric-lbl">Last Sync</div>
+              </div>
+              <div class="db-metric">
+                <div class="db-metric-val" id="dbPingMs">—</div>
+                <div class="db-metric-lbl">Ping (ms)</div>
+              </div>
+              <div class="db-metric">
+                <div class="db-metric-val" id="dbRecordCount">—</div>
+                <div class="db-metric-lbl">Total Records</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GAS URL Input -->
+          <div class="form-group">
+            <label>GAS Web App URL</label>
+            <input type="url" id="gasUrl"
+              placeholder="https://script.google.com/macros/s/.../exec"
+              oninput="onGasUrlInput()"/>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="db-action-row">
+            <button class="btn-connect" onclick="saveAndConnect()">⚡ Save &amp; Connect</button>
+            <button class="btn-ghost"   onclick="pingDatabase()">🏓 Ping</button>
+            <button class="btn-ghost"   onclick="forceSyncNow()">🔄 Sync Now</button>
+            <button class="btn-disconnect" id="btnDisconnect" onclick="disconnectDatabase()" style="display:none">✕ Disconnect</button>
+          </div>
+
+          <!-- Connection Log -->
+          <div class="db-log" id="dbLog">
+            <div class="db-log-entry info">
+              <span class="ts" id="dbLogInitTs"></span>
+              <span class="msg">System ready. Enter your GAS Web App URL and click Connect.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-title">📄 Invoice Settings</div>
+          <div class="form-group">
+            <label>GST Rate (%)</label>
+            <input type="number" id="gstRate" placeholder="e.g. 18" value="18" />
+          </div>
+          <div class="form-group">
+            <label>Low Stock Threshold (Default)</label>
+            <input type="number" id="defaultThreshold" value="10"/>
+          </div>
+          <button class="btn-primary" onclick="saveInvoiceConfig()">Save Invoice Settings</button>
+        </div>
+
+        <div class="settings-card danger-zone">
+          <div class="settings-title">⚠️ Data Management</div>
+          <button class="btn-danger" onclick="clearSalesCache()">Clear Sales Cache</button>
+          <button class="btn-danger" onclick="resetInventoryAlerts()">Reset All Alerts</button>
+          <button class="btn-danger" onclick="exportAllData()">Export All Data (JSON)</button>
+        </div>
+      </div>
+    </div>
+    <!-- PAGE: REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="card table-card">
+        <div class="card-header" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+          <h3 class="card-title" style="margin:0; flex-shrink:0;">&#128202; Items Report</h3>
+          
+          <div style="flex: 1; display:flex; justify-content:center;">
+            <input type="text" id="reportSearch" placeholder="&#128269; Search party or item..." onkeyup="renderReports()" style="width:100%; max-width:350px; padding:.4rem .75rem; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-base); color:var(--text-primary);" />
+          </div>
+
+          <div class="card-actions" style="display:flex; align-items:center; gap:0.75rem; margin:0; flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-base); padding:0.2rem 0.5rem; border-radius:var(--radius-sm); border:1px solid var(--border);">
+              <select id="reportType" class="status-select" onchange="updateReportFilters()" style="border:none; background:transparent; padding:0.2rem; font-weight:600;">
+                <option value="month">Refill: Month</option>
+                <option value="day">Refill: Day</option>
+                <option value="custom">Refill: Range</option>
+                <option value="expiry_month">Expiry: Month</option>
+                <option value="expiry_day">Expiry: Day</option>
+                <option value="expiry_custom">Expiry: Range</option>
+                <option value="due_soon">&#9200; Due Soon (&le;30 days)</option>
+                <option value="expired">&#128197; Expired</option>
+                <option value="all">All Items</option>
+              </select>
+              <div style="width:1px; height:18px; background:var(--border);"></div>
+              <span id="reportDateFilters" style="display:flex; align-items:center; gap:0.5rem;">
+                <input type="month" id="reportMonthPicker" onchange="renderReports()" style="padding:.2rem; border:none; background:transparent; color:var(--text-primary); outline:none; font-family:inherit;" />
+              </span>
+            </div>
+            <button id="reportSyncBtn" onclick="syncReportsFromBackend()" title="Pull latest data from Google Sheets" style="display:flex; align-items:center; gap:0.4rem; padding:0.5rem 0.8rem; background:var(--bg-card); border:1px solid var(--border); color:var(--text-primary); border-radius:var(--radius-sm); cursor:pointer; font-family:inherit; font-size:0.85rem; font-weight:600; transition:all 0.2s;">
+              &#128260; Sync Now
+            </button>
+            <button class="btn-primary" onclick="exportReportsCSV()" title="Export current report to CSV" style="display:flex; align-items:center; gap:0.4rem; padding:0.5rem 0.8rem;">
+              &#128229; Export CSV
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Party Name</th>
+                <th>Item Name</th>
+                <th>Refilling Date</th>
+                <th>Next Duration Date</th>
+                <th style="text-align:center;">Status</th>
+                <th style="text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="reportsBody">
+              <!-- Rows rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="modalBox">
+      <button class="modal-close" onclick="closeModal(null)">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ADMIN ASSISTANT FLOATING CHATBOT -->
+  <div class="chatbot-container" id="adminChatbotContainer">
+    <div class="chatbot-header">
+      <div class="chatbot-header-left">
+        <div class="bot-avatar">🛡️</div>
+        <div>
+          <div class="bot-name">NF FireBot Admin Assistant</div>
+          <div class="bot-status">🟢 Live System Reports Active</div>
+        </div>
+      </div>
+      <div class="chatbot-header-actions">
+        <button class="chat-action-btn" id="adminChatMuteBtn" onclick="toggleAdminChatMute()" title="Toggle voice response">🔇</button>
+        <button class="chat-action-btn" onclick="closeAdminChatbot()">✕</button>
+      </div>
+    </div>
+    <div class="chatbot-messages" id="adminChatMessages"></div>
+    <div class="chatbot-suggestions" id="adminChatSuggestions"></div>
+    <div class="chatbot-input-area">
+      <button class="chat-mic-btn" id="adminChatMicBtn" onclick="toggleAdminVoiceInput()" title="Voice input">🎙️</button>
+      <input type="text" id="adminChatInput" placeholder="Ask for overall status, sales, inventory..." onkeydown="adminChatKeydown(event)"/>
+      <button class="chat-send-btn" onclick="sendAdminChatMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- CHATBOT FAB -->
+  <button class="chatbot-fab" id="adminChatbotFab" onclick="openAdminChatbot()" title="Open Admin Assistant">
+    🤖
+    <span class="fab-pulse"></span>
+  </button>
+
+  <!-- GAS API Config: Must load BEFORE admin.js -->
+  <script src="gas_api_config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

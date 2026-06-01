@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - NF Fire Extinguisher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Shake animation for error */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            15% { transform: translateX(-8px); }
+            30% { transform: translateX(8px); }
+            45% { transform: translateX(-6px); }
+            60% { transform: translateX(6px); }
+            75% { transform: translateX(-3px); }
+            90% { transform: translateX(3px); }
+        }
+        .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+
+        /* Pulse animation for success icon */
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(76,209,55,0.5); }
+            70% { box-shadow: 0 0 0 20px rgba(76,209,55,0); }
+            100% { box-shadow: 0 0 0 0 rgba(76,209,55,0); }
+        }
+        .pulse-success { animation: pulse-green 1.2s ease-out infinite; }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255,51,51,0.5); }
+            70% { box-shadow: 0 0 0 20px rgba(255,51,51,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,51,51,0); }
+        }
+        .pulse-error { animation: pulse-red 1.2s ease-out infinite; }
+
+        .alert-icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+        .alert-icon-circle.success-circle {
+            background: rgba(76,209,55,0.15);
+            border: 2px solid #4cd137;
+        }
+        .alert-icon-circle.error-circle {
+            background: rgba(255,51,51,0.15);
+            border: 2px solid #ff3333;
+        }
+
+        .alert-modal .company-logo {
+            max-width: 80px;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        .alert-modal .company-name {
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Error detail badge */
+        .error-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,51,51,0.1);
+            border: 1px solid rgba(255,51,51,0.3);
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            font-size: 0.82rem;
+            color: #ff6666;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<script>
+    // Apply theme immediately if stored, default to light
+    (function() {
+        const savedTheme = localStorage.getItem('sysadmin_theme') || localStorage.getItem('nf_theme');
+        if (savedTheme !== 'dark') {
+            document.body.classList.add('light-theme');
+        }
+
+        // Auto-redirect if already logged in
+        const existing = localStorage.getItem('admin_data') || sessionStorage.getItem('admin_data');
+        if (existing) {
+            window.location.replace('dashboard.html');
+        }
+    })();
+</script>
+
+    <!-- ✅ SUCCESS MODAL -->
+    <div class="alert-modal-overlay" id="successModal">
+        <div class="alert-modal success">
+            <img src="assets/IMAGES/Logo.jpg" alt="NF Fire Logo" class="company-logo"
+                 onerror="this.style.display='none'">
+            <div class="company-name">NF Fire Extinguisher</div>
+            <div class="alert-icon-circle success-circle pulse-success">✔</div>
+            <h2>Login Successful!</h2>
+            <p>Welcome back, <strong id="successName"></strong>. Redirecting to your dashboard…</p>
+        </div>
+    </div>
+
+    <!-- ❌ ERROR MODAL -->
+    <div class="alert-modal-overlay" id="errorModal">
+        <div class="alert-modal error" id="errorModalBox">
+            <div class="alert-icon-circle error-circle pulse-error">✕</div>
+            <h2>Access Denied</h2>
+            <div class="error-badge">
+                <span>⚠</span>
+                <span id="errorDetail">Invalid credentials</span>
+            </div>
+            <p>Please check your email and password and try again.</p>
+            <button class="btn btn-primary" onclick="closeErrorModal()"
+                style="background: linear-gradient(135deg,#ff3333,#cc0000); box-shadow: 0 0 15px rgba(255,51,51,0.4);">
+                Try Again
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="glass-panel">
+            <div class="header">
+                <img src="assets/IMAGES/Logo.jpg" alt="Logo" 
+                     style="max-width:60px; border-radius:10px; margin-bottom:0.75rem;"
+                     onerror="this.style.display='none'">
+                <h1>NF Admin</h1>
+                <p>Sign in to continue</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="name">Admin Name</label>
+                    <input type="text" id="name" class="form-control" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" required placeholder="admin@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <span id="btnText">Sign In</span>
+                    <div class="spinner" id="btnSpinner"></div>
+                </button>
+                <br>
+                  <button type="reset" class="btn btn-primary" id="loginBtn">
+                    <span id="btnText">Reset</span>
+                    <div class="spinner" ></div>
+                  </button>
+             </form>
+        </div>
+    </div>
+
+    <script src="api_config.js"></script>
+    <script>
+        function showSuccess(name) {
+            document.getElementById('successName').textContent = name;
+            document.getElementById('successModal').classList.add('active');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2200);
+        }
+
+        function showError(msg) {
+            document.getElementById('errorDetail').textContent = msg || 'Invalid credentials';
+            const overlay = document.getElementById('errorModal');
+            const box = document.getElementById('errorModalBox');
+            overlay.classList.add('active');
+            box.classList.add('shake');
+            setTimeout(() => box.classList.remove('shake'), 700);
+        }
+
+        function closeErrorModal() {
+            document.getElementById('errorModal').classList.remove('active');
+            const btn = document.getElementById('loginBtn');
+            document.getElementById('btnText').style.display = 'block';
+            document.getElementById('btnSpinner').style.display = 'none';
+            btn.disabled = false;
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const btn = document.getElementById('loginBtn');
+
+            const name     = document.getElementById('name').value.trim();
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Loading state
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'block';
+            btn.disabled = true;
+
+            try {
+                if (CONFIG.isSimulationMode()) {
+                    // Simulate credential check
+                    await new Promise(r => setTimeout(r, 1000));
+                    if (email === 'admin@example.com' && password === 'adminpassword123') {
+                        localStorage.setItem('admin_data', JSON.stringify({ name, email }));
+                        sessionStorage.setItem('admin_data', JSON.stringify({ name, email }));
+                        showSuccess(name);
+                    } else {
+                        showError('Incorrect email or password');
+                    }
+                    return;
+                }
+
+                const formData = new URLSearchParams();
+                formData.append('name', name);
+                formData.append('email', email);
+                formData.append('password', password);
+
+                const response = await fetch(CONFIG.GAS_WEB_APP_URL, { method: 'POST', body: formData });
+                const result   = await response.json();
+
+                if (result.status === 'success') {
+                    const sessionInfo = {
+                        name:  result.data.name,
+                        email: result.data.email
+                    };
+                    localStorage.setItem('admin_data', JSON.stringify(sessionInfo));
+                    sessionStorage.setItem('admin_data', JSON.stringify(sessionInfo));
+                    showSuccess(result.data.name || name);
+                } else {
+                    showError(result.message || 'Incorrect email or password');
+                }
+            } catch (err) {
+                showError('Unable to connect. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

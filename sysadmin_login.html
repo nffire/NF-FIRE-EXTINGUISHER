@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Admin Login - NF Fire Extinguisher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            15% { transform: translateX(-8px); }
+            30% { transform: translateX(8px); }
+            45% { transform: translateX(-6px); }
+            60% { transform: translateX(6px); }
+            75% { transform: translateX(-3px); }
+            90% { transform: translateX(3px); }
+        }
+        .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes pulse-green {
+            0%   { box-shadow: 0 0 0 0 rgba(76,209,55,0.5); }
+            70%  { box-shadow: 0 0 0 20px rgba(76,209,55,0); }
+            100% { box-shadow: 0 0 0 0 rgba(76,209,55,0); }
+        }
+        .pulse-success { animation: pulse-green 1.2s ease-out infinite; }
+
+        @keyframes pulse-amber {
+            0%   { box-shadow: 0 0 0 0 rgba(255,170,0,0.5); }
+            70%  { box-shadow: 0 0 0 20px rgba(255,170,0,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,170,0,0); }
+        }
+        .pulse-amber { animation: pulse-amber 1.2s ease-out infinite; }
+
+        .alert-icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+        .success-circle {
+            background: rgba(76,209,55,0.15);
+            border: 2px solid #4cd137;
+        }
+        .error-circle {
+            background: rgba(255,51,51,0.15);
+            border: 2px solid #ff3333;
+        }
+
+        .alert-modal .company-logo {
+            max-width: 80px;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        .alert-modal .company-name {
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        .error-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,51,51,0.1);
+            border: 1px solid rgba(255,51,51,0.3);
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            font-size: 0.82rem;
+            color: #ff6666;
+            margin-bottom: 1.5rem;
+        }
+        .alert-modal.sysadmin-success {
+            border-color: #ffaa00;
+            box-shadow: 0 0 25px rgba(255,170,0,0.35);
+        }
+        .alert-modal.sysadmin-success h2 { color: #ffaa00; }
+
+        /* Light Theme Styles */
+        body.light-theme {
+            --bg-dark: #f5f5f7;
+            --bg-panel: rgba(255, 255, 255, 0.7);
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --glass-border: rgba(0, 0, 0, 0.08);
+            background: radial-gradient(circle at center, #fff3eb 0%, #f5f5f7 70%) !important;
+            color: #1d1d1f !important;
+        }
+        body.light-theme .glass-panel {
+            background: rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.4) !important;
+            border-color: rgba(255, 170, 0, 0.4) !important;
+        }
+        body.light-theme .form-control {
+            background: rgba(0,0,0,0.05) !important;
+            color: #1d1d1f !important;
+            border-color: rgba(0,0,0,0.1) !important;
+        }
+        body.light-theme .form-control:focus {
+            background: rgba(0,0,0,0.08) !important;
+            border-color: #ffaa00 !important;
+        }
+        body.light-theme .form-group label {
+            color: #86868b !important;
+        }
+        body.light-theme .alert-modal {
+            background: #ffffff !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+            border-color: rgba(0,0,0,0.1) !important;
+        }
+        body.light-theme .alert-modal.sysadmin-success {
+            border-color: #ffaa00 !important;
+            box-shadow: 0 0 25px rgba(255,170,0,0.2) !important;
+        }
+        body.light-theme .alert-modal h2 {
+            color: #1d1d1f !important;
+        }
+        body.light-theme .alert-modal.sysadmin-success h2 {
+            color: #ffaa00 !important;
+        }
+        body.light-theme .alert-modal p {
+            color: #86868b !important;
+        }
+    </style>
+</head>
+<body>
+<script>
+    // Apply theme immediately if stored, default to light
+    (function() {
+        const savedTheme = localStorage.getItem('sysadmin_theme') || localStorage.getItem('nf_theme');
+        if (savedTheme !== 'dark') {
+            document.body.classList.add('light-theme');
+        }
+    })();
+</script>
+
+    <!-- ✅ SUCCESS MODAL -->
+    <div class="alert-modal-overlay" id="successModal">
+        <div class="alert-modal sysadmin-success">
+            <img src="assets/IMAGES/Logo.jpg" alt="NF Fire Logo" class="company-logo"
+                 onerror="this.style.display='none'">
+            <div class="company-name">NF Fire Extinguisher</div>
+            <div class="alert-icon-circle" style="background:rgba(255,170,0,0.15); border:2px solid #ffaa00; font-size:2rem; width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;" class="pulse-amber">⚙️</div>
+            <h2>Authentication Successful!</h2>
+            <p>Welcome, <strong>System Administrator</strong>.<br>Redirecting to the report…</p>
+        </div>
+    </div>
+
+    <!-- ❌ ERROR MODAL -->
+    <div class="alert-modal-overlay" id="errorModal">
+        <div class="alert-modal error" id="errorModalBox">
+            <div class="alert-icon-circle error-circle">✕</div>
+            <h2>Access Denied</h2>
+            <div class="error-badge">
+                <span>⚠</span>
+                <span id="errorDetail">Invalid credentials</span>
+            </div>
+            <p>This is a restricted area. Please verify your credentials and try again.</p>
+            <button class="btn btn-primary" onclick="closeErrorModal()"
+                style="background: linear-gradient(135deg,#ff3333,#cc0000); box-shadow: 0 0 15px rgba(255,51,51,0.4);">
+                Try Again
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="glass-panel" style="border-color: #ffaa00;">
+            <div class="header">
+                <img src="assets/IMAGES/Logo.jpg" alt="Logo"
+                     style="max-width:60px; border-radius:10px; margin-bottom:0.75rem;"
+                     onerror="this.style.display='none'">
+                <h1 style="background: linear-gradient(135deg, #ffaa00, #ff4500); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    System Admin
+                </h1>
+                <p>Restricted Access Area</p>
+            </div>
+
+            <form id="sysAdminLoginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" required placeholder="Enter system username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="loginBtn"
+                    style="background: linear-gradient(135deg, #ffaa00, #ff4500); box-shadow: 0 0 15px rgba(255,170,0,0.4);">
+                    <span id="btnText">Authenticate</span>
+                    <div class="spinner" id="btnSpinner"></div>
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.2rem;">
+                <a href="dashboard.html" style="color: var(--text-muted); font-size: 0.85rem; text-decoration: none;">
+                    &larr; Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="api_config.js"></script>
+    <script>
+        // ── Auto-redirect if already authenticated ──────────────────────
+        (function() {
+            const existing = localStorage.getItem('sysadmin_data') || sessionStorage.getItem('sysadmin_data');
+            if (existing) {
+                // Already logged in — skip login page entirely
+                window.location.replace('sysadmin_report.html');
+            }
+        })();
+
+        function showSuccess() {
+            document.getElementById('successModal').classList.add('active');
+            setTimeout(() => {
+                // Use replace() so the login page is NOT kept in browser history.
+                // Pressing the Back button from sysadmin_report.html will go to
+                // dashboard.html (or wherever the user came from), not back here.
+                window.location.replace('sysadmin_report.html');
+            }, 2200);
+        }
+
+        function showError(msg) {
+            document.getElementById('errorDetail').textContent = msg || 'Invalid credentials';
+            const overlay = document.getElementById('errorModal');
+            const box     = document.getElementById('errorModalBox');
+            overlay.classList.add('active');
+            box.classList.add('shake');
+            setTimeout(() => box.classList.remove('shake'), 700);
+        }
+
+        function closeErrorModal() {
+            document.getElementById('errorModal').classList.remove('active');
+            document.getElementById('btnText').style.display   = 'block';
+            document.getElementById('btnSpinner').style.display = 'none';
+            document.getElementById('loginBtn').disabled = false;
+        }
+
+        document.getElementById('sysAdminLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btnText   = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const btn       = document.getElementById('loginBtn');
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            btnText.style.display   = 'none';
+            btnSpinner.style.display = 'block';
+            btn.disabled = true;
+
+            try {
+                if (CONFIG.isSimulationMode()) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    if (username === "h@rsh@dteli" && password === "harshadteli2472") {
+                        const sessionData = {
+                            role:      "System Administrator",
+                            username:  username,
+                            password:  password,
+                            loginTime: new Date().toLocaleString()
+                        };
+                        localStorage.setItem('sysadmin_data', JSON.stringify(sessionData));
+                        sessionStorage.setItem('sysadmin_data', JSON.stringify(sessionData));
+                        showSuccess();
+                    } else {
+                        showError('Incorrect username or password');
+                    }
+                    return;
+                }
+
+                const formData = new URLSearchParams();
+                formData.append('type',     'sysadmin');
+                formData.append('email',    username);
+                formData.append('password', password);
+
+                const response = await fetch(CONFIG.GAS_WEB_APP_URL, { method: 'POST', body: formData });
+                const result   = await response.json();
+
+                if (result.status === 'success') {
+                    localStorage.setItem('sysadmin_data', JSON.stringify(result.data));
+                    sessionStorage.setItem('sysadmin_data', JSON.stringify(result.data));
+                    showSuccess();
+                } else {
+                    showError(result.message || 'Incorrect username or password');
+                }
+            } catch (err) {
+                showError('Unable to connect. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

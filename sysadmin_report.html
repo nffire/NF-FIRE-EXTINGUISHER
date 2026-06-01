@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Administrator - NF Fire Extinguisher</title>
+    <meta name="description" content="NF Fire Extinguisher System Administrator Control Panel">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="api_config.js"></script>
+    <script>
+        // Dynamically load INVENTNF/api_config.js depending on location (root vs MAIN) synchronously
+        if (window.location.pathname.replace(/\\/g, '/').includes('/MAIN/')) {
+            document.write('<script src="../INVENTNF/api_config.js"><\/script>');
+        } else {
+            document.write('<script src="INVENTNF/api_config.js"><\/script>');
+        }
+    </script>
+    <style>
+    /* ════════════════════════════════════════════════════════
+       SYSADMIN REPORT – Full Redesign
+    ════════════════════════════════════════════════════════ */
+    :root {
+        --amber: #ffaa00;
+        --primary: #ff4500;
+        --bg-dark: #0f0f11;
+        --bg-panel: rgba(22,22,28,0.95);
+        --text-main: #ffffff;
+        --text-muted: #8a8a8f;
+        --glass-border: rgba(255,255,255,0.07);
+        --success: #4cd137;
+        --danger: #ff3333;
+        --bg-grad-start: #1a0800;
+        --shadow-glow: rgba(0,0,0,0.5);
+        --topbar-bg: rgba(12,12,15,0.97);
+        --modal-bg: #1a1a1e;
+        --input-bg: rgba(0,0,0,0.25);
+        --btn-ghost-bg: rgba(255,255,255,0.06);
+        --btn-ghost-hover: rgba(255,255,255,0.12);
+    }
+    body.light-theme {
+        --bg-dark: #f5f5f7;
+        --bg-panel: rgba(255, 255, 255, 0.95);
+        --text-main: #1d1d1f;
+        --text-muted: #86868b;
+        --glass-border: rgba(0, 0, 0, 0.08);
+        --bg-grad-start: #fff3eb;
+        --shadow-glow: rgba(0, 0, 0, 0.05);
+        --topbar-bg: rgba(245, 245, 247, 0.97);
+        --modal-bg: #ffffff;
+        --input-bg: rgba(0, 0, 0, 0.05);
+        --btn-ghost-bg: rgba(0,0,0,0.04);
+        --btn-ghost-hover: rgba(0,0,0,0.08);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter','Segoe UI',sans-serif; }
+    body {
+        display: block; /* Override default styles.css flex display to fix layout squishing */
+        background: radial-gradient(ellipse at top, var(--bg-grad-start) 0%, var(--bg-dark) 70%);
+        color: var(--text-main);
+        min-height: 100vh;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── Topbar ─────────────────────────────────────────── */
+    .sa-topbar {
+        display:flex; align-items:center; justify-content:space-between;
+        padding:0.9rem 1.75rem;
+        background: var(--topbar-bg);
+        border-bottom:1px solid var(--glass-border);
+        backdrop-filter:blur(10px);
+        position:sticky; top:0; z-index:100;
+        flex-wrap:wrap; gap:0.5rem;
+        transition: background 0.3s, border-color 0.3s;
+    }
+    .sa-brand { display:flex; align-items:center; gap:0.75rem; }
+    .sa-brand img { max-height:38px; border-radius:7px; }
+    .sa-brand-text h1 { font-size:1.1rem; font-weight:700;
+        background:linear-gradient(135deg,#ffaa00,#ff4500);
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .sa-brand-text span { font-size:0.72rem; color:var(--text-muted); }
+    .sa-topbar-right { display:flex; align-items:center; gap:0.6rem; }
+    .btn { padding:0.5rem 1rem; border:none; border-radius:8px; font-size:0.83rem;
+        font-weight:600; cursor:pointer; transition:all 0.22s; font-family:inherit;
+        display:inline-flex; align-items:center; gap:0.35rem; text-decoration:none; }
+    .btn-amber { background:linear-gradient(135deg,#ffaa00,#ff6600); color:#000; }
+    .btn-amber:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(255,170,0,0.4); }
+    .btn-ghost { background: var(--btn-ghost-bg); color:var(--text-muted); border:1px solid var(--glass-border); }
+    .btn-ghost:hover { background: var(--btn-ghost-hover); color: var(--text-main); }
+    .btn-outline-amber { background:transparent; color:#ffaa00; border:1.5px solid #ffaa00; }
+    .btn-outline-amber:hover { background:rgba(255,170,0,0.1); }
+    .btn-danger-sm { background:rgba(255,51,51,0.12); color:#ff6666; border:1px solid rgba(255,51,51,0.25); border-radius:6px; padding:0.3rem 0.6rem; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .btn-danger-sm:hover { background:rgba(255,51,51,0.25); }
+    .btn-edit-sm  { background:rgba(255,170,0,0.1); color:#ffaa00; border:1px solid rgba(255,170,0,0.25); border-radius:6px; padding:0.3rem 0.6rem; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .btn-edit-sm:hover { background:rgba(255,170,0,0.25); }
+
+    /* ── View Wrapper / Transitions ─────────────────────── */
+    .view { display:none; animation:fadeSlide 0.3s ease; }
+    .view.active { display:block; }
+    @keyframes fadeSlide { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .page-wrap { max-width:1100px; margin:0 auto; padding:2rem 1.5rem; }
+
+    /* ── Breadcrumb ─────────────────────────────────────── */
+    .breadcrumb { display:flex; align-items:center; gap:0.4rem;
+        font-size:0.8rem; color:var(--text-muted); margin-bottom:1.5rem; flex-wrap:wrap; }
+    .breadcrumb span { color:#ffaa00; font-weight:600; }
+    .breadcrumb a { color:var(--text-muted); cursor:pointer; text-decoration:none; }
+    .breadcrumb a:hover { color: var(--text-main); }
+    .breadcrumb-sep { opacity:0.4; }
+
+    /* ── Landing: Three Option Cards ───────────────────── */
+    .landing-header { text-align:center; margin-bottom:2.5rem; }
+    .landing-header h2 { font-size:1.9rem; font-weight:700; margin-bottom:0.5rem;
+        background:linear-gradient(135deg,#ffaa00,#ff4500);
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .landing-header p { color:var(--text-muted); font-size:0.95rem; }
+    .option-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+    .option-card {
+        background:var(--bg-panel);
+        border:1px solid var(--glass-border);
+        border-radius:18px; padding:2rem 1.5rem;
+        cursor:pointer; transition:all 0.28s;
+        text-align:center; position:relative; overflow:hidden;
+    }
+    .option-card::before {
+        content:''; position:absolute; inset:0;
+        background:linear-gradient(135deg, transparent, rgba(255,170,0,0.04));
+        opacity:0; transition:opacity 0.28s;
+    }
+    .option-card:hover { transform:translateY(-5px); border-color:rgba(255,170,0,0.4);
+        box-shadow:0 12px 40px var(--shadow-glow); }
+    .option-card:hover::before { opacity:1; }
+    .option-card .oc-icon { font-size:2.8rem; margin-bottom:1rem; display:block; }
+    .option-card h3 { font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; color: var(--text-main); }
+    .option-card p  { font-size:0.82rem; color:var(--text-muted); line-height:1.5; }
+    .option-card .oc-badge {
+        display:inline-block; margin-top:1rem;
+        background:rgba(255,170,0,0.12); color:#ffaa00;
+        border:1px solid rgba(255,170,0,0.25);
+        border-radius:20px; padding:0.2rem 0.75rem;
+        font-size:0.72rem; font-weight:700; letter-spacing:0.04em;
+    }
+    .option-card.oc-reports  { border-color:rgba(255,170,0,0.15); }
+    .option-card.oc-db       { border-color:rgba(76,209,55,0.15); }
+    .option-card.oc-overview { border-color:rgba(100,180,255,0.15); }
+    .option-card.oc-db:hover    { border-color:rgba(76,209,55,0.5); box-shadow:0 12px 40px rgba(76,209,55,0.1); }
+    .option-card.oc-overview:hover { border-color:rgba(100,180,255,0.5); box-shadow:0 12px 40px rgba(100,180,255,0.1); }
+    .option-card.oc-db .oc-badge    { background:rgba(76,209,55,0.1); color:#4cd137; border-color:rgba(76,209,55,0.25); }
+    .option-card.oc-overview .oc-badge { background:rgba(100,180,255,0.1); color:#64b4ff; border-color:rgba(100,180,255,0.25); }
+
+    /* ── Section Header ─────────────────────────────────── */
+    .section-head { display:flex; align-items:center; justify-content:space-between;
+        margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem; }
+    .section-head h2 { font-size:1.3rem; font-weight:700; }
+    .section-head-actions { display:flex; gap:0.6rem; flex-wrap:wrap; }
+
+    /* ── Warning Banner ─────────────────────────────────── */
+    .warn-banner {
+        background:rgba(255,170,0,0.07); border:1px solid rgba(255,170,0,0.2);
+        border-radius:10px; padding:0.75rem 1.1rem;
+        font-size:0.82rem; color:#ffcc44; margin-bottom:1.5rem;
+        display:flex; align-items:center; gap:0.5rem;
+    }
+
+    /* ── DB Overview Grid (in DB Connections view) ─────── */
+    .db-overview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .db-ov-card {
+        background:var(--bg-panel); border:1px solid var(--glass-border);
+        border-radius:14px; padding:1.25rem 1.4rem;
+        cursor:pointer; transition:all 0.25s;
+        display:flex; align-items:center; gap:1.1rem;
+        position:relative; overflow:hidden;
+    }
+    .db-ov-card::after { content:'›'; position:absolute; right:1.2rem;
+        font-size:1.4rem; color:var(--text-muted); transition:all 0.2s; }
+    .db-ov-card:hover { transform:translateY(-3px); box-shadow:0 8px 30px var(--shadow-glow); }
+    .db-ov-card:hover::after { right:0.85rem; color: var(--text-main); }
+    .db-ov-card.st-ok   { border-color:rgba(76,209,55,0.35); }
+    .db-ov-card.st-ok:hover { box-shadow:0 8px 30px rgba(76,209,55,0.1); }
+    .db-ov-card.st-err  { border-color:rgba(255,51,51,0.35); }
+    .db-ov-card.st-chk  { border-color:rgba(255,170,0,0.35); }
+    .db-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; position:relative; }
+    .db-dot::after { content:''; position:absolute; inset:-4px; border-radius:50%; animation:pulse-ring 1.6s ease infinite; }
+    .db-dot.green { background:#4cd137; } .db-dot.green::after { border:2px solid #4cd137; }
+    .db-dot.red   { background:#ff3333; } .db-dot.red::after   { border:2px solid #ff3333; animation:none; }
+    .db-dot.amber { background:#ffaa00; } .db-dot.amber::after { border:2px solid #ffaa00; }
+    @keyframes pulse-ring { 0%{transform:scale(0.8);opacity:.9} 70%{transform:scale(1.9);opacity:0} 100%{transform:scale(0.8);opacity:0} }
+    .db-ov-info { flex:1; min-width:0; }
+    .db-ov-info .doi-name { font-size:0.9rem; font-weight:600; color: var(--text-main); margin-bottom:2px; }
+    .db-ov-info .doi-type { font-size:0.75rem; color:var(--text-muted); }
+    .db-ov-info .doi-status { font-size:0.78rem; font-weight:700; margin-top:4px; }
+    .doi-status.ok  { color:#4cd137; }
+    .doi-status.err { color:#ff4444; }
+    .doi-status.chk { color:#ffaa00; }
+
+    /* ── DB Detail Card ─────────────────────────────────── */
+    .detail-hero {
+        background:var(--bg-panel); border-radius:16px;
+        padding:1.75rem 2rem; margin-bottom:1.5rem;
+        border:1px solid var(--glass-border);
+        display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;
+    }
+    .detail-hero-dot { width:22px; height:22px; border-radius:50%; flex-shrink:0; position:relative; }
+    .detail-hero-dot::after { content:''; position:absolute; inset:-6px; border-radius:50%; animation:pulse-ring 1.6s ease infinite; }
+    .detail-hero-dot.green { background:#4cd137; } .detail-hero-dot.green::after { border:2px solid #4cd137; }
+    .detail-hero-dot.red   { background:#ff3333; } .detail-hero-dot.red::after   { border:2px solid #ff3333; animation:none; }
+    .detail-hero-dot.amber { background:#ffaa00; } .detail-hero-dot.amber::after { border:2px solid #ffaa00; }
+    .detail-hero-body { flex:1; min-width:0; }
+    .detail-hero-body h2 { font-size:1.3rem; font-weight:700; margin-bottom:4px; }
+    .detail-hero-body .dh-subtitle { font-size:0.82rem; color:var(--text-muted); }
+    .detail-hero-status { font-size:1.1rem; font-weight:700; padding:0.4rem 1.1rem; border-radius:25px; }
+    .detail-hero-status.ok  { background:rgba(76,209,55,0.12); color:#4cd137; border:1px solid rgba(76,209,55,0.3); }
+    .detail-hero-status.err { background:rgba(255,51,51,0.12);  color:#ff4444; border:1px solid rgba(255,51,51,0.3); }
+    .detail-hero-status.chk { background:rgba(255,170,0,0.12); color:#ffaa00; border:1px solid rgba(255,170,0,0.3); }
+    .detail-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .detail-stat { background:var(--bg-panel); border:1px solid var(--glass-border);
+        border-radius:12px; padding:1.1rem 1.3rem; }
+    .detail-stat .ds-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.4rem; }
+    .detail-stat .ds-value { font-size:1.4rem; font-weight:700; color: var(--text-main); }
+    .detail-stat .ds-sub   { font-size:0.75rem; color:var(--text-muted); margin-top:2px; }
+    .detail-info-card { background:var(--bg-panel); border:1px solid var(--glass-border); border-radius:14px; padding:1.4rem 1.6rem; margin-bottom:1.5rem; }
+    .detail-info-card h3 { font-size:0.9rem; font-weight:700; color:#ffaa00; margin-bottom:1rem; text-transform:uppercase; letter-spacing:0.05em; }
+    .di-row { display:flex; justify-content:space-between; padding:0.65rem 0;
+        border-bottom:1px solid var(--glass-border); font-size:0.88rem; flex-wrap:wrap; gap:0.25rem; }
+    .di-row:last-child { border-bottom:none; }
+    .di-key { color:var(--text-muted); }
+    .di-val { font-weight:600; color: var(--text-main); text-align:right; word-break:break-all; }
+    .ping-log { background:rgba(0,0,0,0.3); border-radius:10px; padding:1rem 1.2rem; }
+    .ping-log h3 { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.75rem; }
+    .ping-entry { display:flex; align-items:center; gap:0.65rem; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.82rem; }
+    .ping-entry:last-child { border-bottom:none; }
+    .ping-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .ping-dot.ok  { background:#4cd137; }
+    .ping-dot.err { background:#ff3333; }
+    .ping-time { color:var(--text-muted); flex-shrink:0; }
+    .ping-msg  { flex:1; }
+
+    /* ── System Overview Stats ──────────────────────────── */
+    .ov-stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .ov-stat-card { background:var(--bg-panel); border:1px solid var(--glass-border); border-radius:12px; padding:1.1rem 1.3rem; }
+    .ov-stat-card .osc-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.35rem; }
+    .ov-stat-card .osc-val   { font-size:1.8rem; font-weight:700; }
+    .ov-stat-card.c-amber .osc-val { color:#ffaa00; }
+    .ov-stat-card.c-green .osc-val { color:#4cd137; }
+    .ov-stat-card.c-blue  .osc-val { color:#64b4ff; }
+    .ov-stat-card.c-red   .osc-val { color:#ff4444; }
+
+    /* ── Reports Table ──────────────────────────────────── */
+    .table-panel { background:var(--bg-panel); border:1px solid var(--glass-border); border-radius:16px; overflow:hidden; }
+    .table-panel-head { display:flex; align-items:center; justify-content:space-between;
+        padding:1.1rem 1.4rem; border-bottom:1px solid var(--glass-border); flex-wrap:wrap; gap:0.75rem; }
+    .table-panel-head h3 { font-size:0.95rem; font-weight:600; }
+    .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table.rt { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.rt th { padding:0.8rem 1rem; text-align:left; font-size:0.72rem; text-transform:uppercase;
+        letter-spacing:0.06em; color:var(--text-muted); border-bottom:1px solid var(--glass-border); white-space:nowrap; }
+        table.rt td { padding:0.85rem 1rem; border-bottom:1px solid var(--glass-border); vertical-align:middle; }
+    table.rt tbody tr:hover { background:rgba(255,255,255,0.025); }
+    body.light-theme table.rt tbody tr:hover { background:rgba(0,0,0,0.02); }
+    table.rt tbody tr:last-child td { border-bottom:none; }
+    .role-badge { display:inline-block; background:#ffaa00; color:#000;
+        padding:0.15rem 0.55rem; border-radius:6px; font-size:0.72rem; font-weight:700; }
+    .status-ok  { color:#4cd137; font-weight:700; }
+    .status-err { color:#ff4444; font-weight:700; }
+    .action-set { display:flex; gap:0.35rem; }
+    .search-wrap { display:flex; align-items:center; gap:0.5rem;
+        background:rgba(0,0,0,0.3); border:1px solid var(--glass-border);
+        border-radius:8px; padding:0.4rem 0.75rem; }
+    body.light-theme .search-wrap { background:rgba(0,0,0,0.03); }
+    .search-wrap input { background:none; border:none; outline:none; color: var(--text-main); font-size:0.87rem; width:180px; }
+
+    /* ── Spinners ───────────────────────────────────────── */
+    .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.2);
+        border-top-color:#fff; border-radius:50%; animation:spin 0.75s linear infinite; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── Modal ──────────────────────────────────────────── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85);
+        display:flex; justify-content:center; align-items:center; z-index:500;
+        opacity:0; pointer-events:none; transition:opacity 0.3s; backdrop-filter:blur(4px); }
+    .modal-overlay.active { opacity:1; pointer-events:auto; }
+    .modal-box { width:92%; max-width:460px; background: var(--modal-bg);
+        border:1px solid var(--amber); border-radius:16px; padding:2rem;
+        box-shadow:0 0 30px rgba(255,170,0,0.2);
+        transform:translateY(-12px) scale(0.97); transition:transform 0.3s; }
+    .modal-overlay.active .modal-box { transform:none; }
+    .modal-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+    .modal-top h2 { font-size:1rem; color:#ffaa00; }
+    .modal-close { background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer; }
+    .modal-close:hover { color: var(--text-main); }
+    .form-group { margin-bottom:1.1rem; }
+    .form-group label { display:block; font-size:0.75rem; font-weight:600; text-transform:uppercase;
+        letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.4rem; }
+    .form-control { width:100%; padding:0.7rem 0.9rem; background: var(--input-bg);
+        border:1px solid var(--glass-border); border-radius:8px; color: var(--text-main); font-size:0.9rem; font-family:inherit; }
+    .form-control:focus { outline:none; border-color:#ffaa00; box-shadow:0 0 8px rgba(255,170,0,0.2); }
+
+    /* ── Print styles ───────────────────────────────────── */
+    .print-header { display:none; align-items:center; gap:1rem; margin-bottom:1rem; }
+    .print-logo { max-height:50px; }
+    .print-company-info h2 { font-size:1.1rem; color:#000; }
+    .print-company-info p  { font-size:0.8rem; color:#555; }
+    @media print {
+        body { background:#fff !important; color:#000 !important; }
+        .sa-topbar, .breadcrumb, .section-head-actions, .btn, .no-print, .warn-banner { display:none !important; }
+        .print-header { display:flex !important; }
+        table.rt th, table.rt td { color:#000 !important; }
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width:768px) {
+        .option-grid { grid-template-columns:1fr; }
+        .detail-hero { flex-direction:column; align-items:flex-start; }
+        .detail-grid { grid-template-columns:repeat(2,1fr); }
+        .page-wrap { padding:1.25rem 1rem; }
+    }
+    @media (max-width:640px) {
+        .sa-topbar-right .btn-label { display: none; }
+        #adminGreeting { display: none; }
+    }
+    @media (max-width:500px) {
+        .sa-topbar { padding:0.75rem 1rem; }
+        .detail-grid, .ov-stats-grid { grid-template-columns:1fr; }
+        .section-head-actions { width:100%; display:flex; gap:0.5rem; }
+        .search-wrap { flex:1; }
+        .search-wrap input { width:100%; }
+    }
+    </style>
+</head>
+<body>
+<script>
+    // Apply theme immediately if stored, default to light
+    (function() {
+        const savedTheme = localStorage.getItem('sysadmin_theme') || localStorage.getItem('nf_theme');
+        if (savedTheme !== 'dark') {
+            document.body.classList.add('light-theme');
+        }
+    })();
+</script>
+
+<!-- ══ TOPBAR ══════════════════════════════════════════════════════════ -->
+<div class="sa-topbar">
+    <div class="sa-brand">
+        <img src="assets/IMAGES/Logo.jpg" alt="NF Logo" onerror="this.style.display='none'">
+        <div class="sa-brand-text">
+            <h1>NF Fire Extinguisher</h1>
+            <span>System Administrator Panel</span>
+        </div>
+    </div>
+    <div class="sa-topbar-right">
+        <span id="adminGreeting" style="font-size:0.8rem;color:var(--text-muted);margin-right:0.3rem;"></span>
+        <button id="themeToggleBtn" class="btn btn-ghost" onclick="toggleTheme()" title="Toggle Theme">
+            🌓 <span class="btn-label">Theme</span>
+        </button>
+        <a href="dashboard.html" class="btn btn-ghost">← <span class="btn-label">Dashboard</span></a>
+        <button class="btn btn-ghost" onclick="doLogout()">🚪 <span class="btn-label">Logout</span></button>
+    </div>
+</div>
+
+<!-- ══ VIEWS ═══════════════════════════════════════════════════════════ -->
+
+<!-- ─── VIEW: LANDING ─── -->
+<div class="view active" id="view-landing">
+    <div class="page-wrap">
+        <div class="landing-header">
+            <h2>System Administrator</h2>
+            <p>Select a module to manage</p>
+        </div>
+        <div class="option-grid">
+
+            <!-- Admin Reports -->
+            <div class="option-card oc-reports" onclick="openView('view-reports')" id="card-reports">
+                <span class="oc-icon">📋</span>
+                <h3>Admin Reports</h3>
+                <p>View, edit and export the complete login audit trail for all administrators.</p>
+                <div class="oc-badge">AUDIT TRAIL</div>
+            </div>
+
+            <!-- Database Connections -->
+            <div class="option-card oc-db" onclick="openView('view-db')" id="card-db">
+                <span class="oc-icon">🔌</span>
+                <h3>Database Connections</h3>
+                <p>Monitor the live connection status of all system databases and services.</p>
+                <div class="oc-badge" id="dbBadge">CHECKING…</div>
+            </div>
+
+            <!-- System Overview -->
+            <div class="option-card oc-overview" onclick="openView('view-overview')" id="card-overview">
+                <span class="oc-icon">📊</span>
+                <h3>System Overview</h3>
+                <p>Quick summary of system health, record counts and session information.</p>
+                <div class="oc-badge" style="background:rgba(100,180,255,0.1);color:#64b4ff;border-color:rgba(100,180,255,0.25);">DASHBOARD</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ─── VIEW: ADMIN REPORTS ─── -->
+<div class="view" id="view-reports">
+    <div class="page-wrap">
+        <div class="breadcrumb">
+            <a onclick="openView('view-landing')">System Admin</a>
+            <span class="breadcrumb-sep">›</span>
+            <span>Admin Reports</span>
+        </div>
+        <div class="warn-banner">⚠️ Highly sensitive data. Ensure secure handling of exported reports.</div>
+        <div class="section-head">
+            <h2>📋 Login Audit Trail</h2>
+            <div class="section-head-actions">
+                <div class="search-wrap">
+                    <span>🔍</span>
+                    <input type="text" id="reportSearch" placeholder="Search…" oninput="filterReportTable()">
+                </div>
+                <button onclick="exportCSV()" class="btn btn-outline-amber">⬇ CSV</button>
+                <button onclick="exportPDF()" class="btn btn-amber">🖨 PDF</button>
+            </div>
+        </div>
+
+        <!-- Print Header (hidden on screen) -->
+        <div class="print-header">
+            <img src="assets/IMAGES/Logo.jpg" alt="Logo" class="print-logo">
+            <div class="print-company-info">
+                <h2>NF Fire Extinguisher</h2>
+                <p>Login Audit Trail Report</p>
+                <p id="printDate"></p>
+            </div>
+        </div>
+
+        <div id="reportArea">
+            <div class="table-panel">
+                <div class="table-panel-head">
+                    <h3>Authentication Records</h3>
+                    <span id="reportCount" style="font-size:0.8rem;color:var(--text-muted);"></span>
+                </div>
+                <div class="tbl-wrap">
+                    <table class="rt">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Admin Name</th>
+                                <th class="no-print">Username</th>
+                                <th class="no-print">Password</th>
+                                <th>Login Timestamp</th>
+                                <th>Status</th>
+                                <th class="no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── VIEW: DATABASE CONNECTIONS ─── -->
+<div class="view" id="view-db">
+    <div class="page-wrap">
+        <div class="breadcrumb">
+            <a onclick="openView('view-landing')">System Admin</a>
+            <span class="breadcrumb-sep">›</span>
+            <span id="dbBreadcrumb">Database Connections</span>
+        </div>
+
+        <!-- DB Overview (default) -->
+        <div id="db-overview-panel">
+            <div class="section-head">
+                <h2>🔌 Database Connections</h2>
+                <div class="section-head-actions">
+                    <button class="btn btn-ghost" onclick="refreshAllDb()">↻ Refresh All</button>
+                </div>
+            </div>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.5rem;">
+                Click a connection to view its detailed status report.
+            </p>
+            <div class="db-overview-grid">
+
+                <!-- Auth DB Card -->
+                <div class="db-ov-card st-chk" id="dbOvCard-auth" onclick="openDbDetail('auth')">
+                    <div class="db-dot amber" id="dbOvDot-auth"></div>
+                    <div class="db-ov-info">
+                        <div class="doi-name">Authentication &amp; Audit DB</div>
+                        <div class="doi-type">GAS · PropertiesService · Login Logs</div>
+                        <div class="doi-status chk" id="dbOvStatus-auth">Checking…</div>
+                    </div>
+                </div>
+
+                <!-- Inventory DB Card -->
+                <div class="db-ov-card st-chk" id="dbOvCard-inv" onclick="openDbDetail('inv')">
+                    <div class="db-dot amber" id="dbOvDot-inv"></div>
+                    <div class="db-ov-info">
+                        <div class="doi-name">Inventory Database</div>
+                        <div class="doi-type" id="dbOvType-inv">GAS · Google Sheets · Inventory Records</div>
+                        <div class="doi-status chk" id="dbOvStatus-inv">Checking…</div>
+                    </div>
+                </div>
+
+                <!-- GST Server Card -->
+                <div class="db-ov-card st-chk" id="dbOvCard-gst" onclick="openDbDetail('gst')" style="border-color:rgba(100,180,255,0.35);">
+                    <div class="db-dot amber" id="dbOvDot-gst"></div>
+                    <div class="db-ov-info">
+                        <div class="doi-name">GST Server</div>
+                        <div class="doi-type">GAS · Google Sheets · GST &amp; Tax Records</div>
+                        <div class="doi-status chk" id="dbOvStatus-gst">Checking…</div>
+                    </div>
+                </div>
+
+                <!-- WGST Server Card -->
+                <div class="db-ov-card st-chk" id="dbOvCard-wgst" onclick="openDbDetail('wgst')" style="border-color:rgba(180,100,255,0.35);">
+                    <div class="db-dot amber" id="dbOvDot-wgst"></div>
+                    <div class="db-ov-info">
+                        <div class="doi-name">WGST Server</div>
+                        <div class="doi-type">GAS · Google Sheets · WGST &amp; Warehouse Tax</div>
+                        <div class="doi-status chk" id="dbOvStatus-wgst">Checking…</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- DB Detail Panel -->
+        <div id="db-detail-panel" style="display:none;">
+            <button class="btn btn-ghost" style="margin-bottom:1.25rem;" onclick="closeDbDetail()">← All Connections</button>
+            <div class="detail-hero" id="dbDetailHero">
+                <div class="detail-hero-dot amber" id="ddDot"></div>
+                <div class="detail-hero-body">
+                    <h2 id="ddName">—</h2>
+                    <div class="dh-subtitle" id="ddType">—</div>
+                </div>
+                <div class="detail-hero-status chk" id="ddStatusBadge">Checking…</div>
+            </div>
+            <div class="detail-grid" id="ddStatsRow">
+                <div class="detail-stat">
+                    <div class="ds-label">Status</div>
+                    <div class="ds-value" id="ddStat-status">—</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="ds-label">Records</div>
+                    <div class="ds-value" id="ddStat-records">—</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="ds-label">Last Checked</div>
+                    <div class="ds-value" id="ddStat-time" style="font-size:0.95rem;">—</div>
+                </div>
+                <div class="detail-stat">
+                    <div class="ds-label">Ping Count</div>
+                    <div class="ds-value" id="ddStat-pings">0</div>
+                </div>
+            </div>
+            <div class="detail-info-card">
+                <h3>Connection Details</h3>
+                <div id="ddInfoRows"></div>
+            </div>
+            <!-- Config panel for GST and WGST Server URLs -->
+            <div class="detail-info-card" id="dbConfigPanel" style="display:none; border-color:var(--amber);">
+                <h3 id="dbConfigTitle">⚙️ Configure Server Connection</h3>
+                <div class="form-group" style="margin-top:0.75rem;">
+                    <label for="dbConfigUrlInput">Google Apps Script Web App URL</label>
+                    <input type="url" id="dbConfigUrlInput" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+                <button class="btn btn-amber" style="width:100%; margin-top:0.5rem;" onclick="saveDbConfigUrl()">💾 Save &amp; Test Connection</button>
+            </div>
+            <div class="ping-log">
+                <h3>Ping History</h3>
+                <div id="ddPingLog">
+                    <div style="color:var(--text-muted);font-size:0.82rem;">No pings yet.</div>
+                </div>
+                <button class="btn btn-ghost" style="margin-top:0.85rem;width:100%;" onclick="pingCurrentDb()">↻ Ping Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── VIEW: SYSTEM OVERVIEW ─── -->
+<div class="view" id="view-overview">
+    <div class="page-wrap">
+        <div class="breadcrumb">
+            <a onclick="openView('view-landing')">System Admin</a>
+            <span class="breadcrumb-sep">›</span>
+            <span>System Overview</span>
+        </div>
+        <div class="section-head">
+            <h2>📊 System Overview</h2>
+            <button class="btn btn-ghost" onclick="buildOverview()">↻ Refresh</button>
+        </div>
+        <div class="ov-stats-grid">
+            <div class="ov-stat-card c-amber">
+                <div class="osc-label">Login Records</div>
+                <div class="osc-val" id="ovLoginCount">—</div>
+            </div>
+            <div class="ov-stat-card c-green">
+                <div class="osc-label">Databases Online</div>
+                <div class="osc-val" id="ovDbOnline">—</div>
+            </div>
+            <div class="ov-stat-card c-blue">
+                <div class="osc-label">Total DBs</div>
+                <div class="osc-val">4</div>
+            </div>
+            <div class="ov-stat-card c-red">
+                <div class="osc-label">DB Errors</div>
+                <div class="osc-val" id="ovDbErrors">—</div>
+            </div>
+        </div>
+        <div class="detail-info-card">
+            <h3>Session Information</h3>
+            <div id="ovSessionRows"></div>
+        </div>
+        <div class="detail-info-card">
+            <h3>Database Summary</h3>
+            <div id="ovDbSummaryRows"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ EDIT MODAL ═══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <div class="modal-top">
+            <h2>✏️ Edit Log Record</h2>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <form id="editForm">
+            <input type="hidden" id="editTimestamp">
+            <div class="form-group"><label>Admin Name</label><input type="text" id="editName" class="form-control" required></div>
+            <div class="form-group"><label>Username / Email</label><input type="email" id="editUsername" class="form-control" required></div>
+            <div class="form-group"><label>Password</label><input type="text" id="editPassword" class="form-control" required></div>
+            <div id="modal-error" style="color:#ff6666;font-size:0.82rem;margin-bottom:0.75rem;display:none;"></div>
+            <button type="submit" class="btn btn-amber" id="saveEditBtn" style="width:100%;">
+                <span id="saveBtnText">Save Changes</span>
+                <span class="spinner" id="saveBtnSpinner" style="display:none;"></span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ══ VIEW RECORD MODAL ════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="viewModal">
+    <div class="modal-box">
+        <div class="modal-top">
+            <h2>👁 Record Details</h2>
+            <button class="modal-close" onclick="document.getElementById('viewModal').classList.remove('active')">×</button>
+        </div>
+        <div id="viewRecordContent"></div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════════
+let reportData   = [];
+let sysadminData = null;
+let currentView  = 'view-landing';
+let currentDb    = null;  // 'auth' | 'inv' | 'gst' | 'wgst'
+
+// localStorage keys used by each GST/WGST module's gas_api_config.js
+const GST_LS_KEY  = 'nffire_gst_gas_url';
+const WGST_LS_KEY = 'nffire_wgst_gas_url';
+
+// Immediate localStorage key migration for backward compatibility
+(function() {
+    const oldGstKey  = 'https://script.google.com/macros/s/AKfycbygnpuU6tzp1gaUDYKsbtIGYsBZ4BWm5qmMx04vxoe5aQCxmWvl3mwZxCnQsCX_74MLKA/exec';
+    const oldWgstKey = 'https://script.google.com/macros/s/AKfycbygnpuU6tzp1gaUDYKsbtIGYsBZ4BWm5qmMx04vxoe5aQCxmWvl3mwZxCnPQry_74MLKA/exec';
+
+    const oldGst = localStorage.getItem(oldGstKey);
+    if (oldGst && oldGst.startsWith('https://')) {
+        localStorage.setItem(GST_LS_KEY, oldGst.trim());
+        localStorage.removeItem(oldGstKey);
+        console.info('[SysAdmin] Migrated GST URL from old key.');
+    }
+
+    const oldWgst = localStorage.getItem(oldWgstKey);
+    if (oldWgst && oldWgst.startsWith('https://')) {
+        localStorage.setItem(WGST_LS_KEY, oldWgst.trim());
+        localStorage.removeItem(oldWgstKey);
+        console.info('[SysAdmin] Migrated WGST URL from old key.');
+    }
+
+    // Auto-correction: if the stored WGST URL is the dummy/failed one, correct it to the real active URL
+    const currentWgst = localStorage.getItem(WGST_LS_KEY);
+    if (currentWgst && currentWgst.includes('AKfycbygnpuU6tzp1gaUDYKsbtIGYsBZ4BWm5qmMx04vxoe5aQCxmWvl3mwZxCnPQry_74MLKA')) {
+        localStorage.setItem(WGST_LS_KEY, 'https://script.google.com/macros/s/AKfycbzJz3il8IDkCzyTBISoQhUaw2rt-Ha34WFRlC53lUIG-M19la29rFYcAYCEgVkXIZBkGw/exec');
+        console.info('[SysAdmin] Corrected dummy WGST URL in localStorage to real active URL.');
+    }
+})();
+
+// DB state store
+const DB_STATE = {
+    auth: { state:'chk', status:'Checking…', records:'—', time:'—', pings:0, log:[] },
+    inv:  { state:'chk', status:'Checking…', records:'—', time:'—', pings:0, log:[] },
+    gst:  { state:'chk', status:'Checking…', records:'—', time:'—', pings:0, log:[] },
+    wgst: { state:'chk', status:'Checking…', records:'—', time:'—', pings:0, log:[] }
+};
+
+const DB_META = {
+    auth: {
+        name: 'Authentication & Audit DB',
+        type: 'Google Apps Script · PropertiesService',
+        purpose: 'Stores login audit logs for all administrators.',
+        endpoint: () => typeof CONFIG !== 'undefined' ? (CONFIG.GAS_WEB_APP_URL || CONFIG.GAS_URL || '—') : '—',
+        mode: () => typeof CONFIG !== 'undefined' && CONFIG.isSimulationMode() ? 'Simulation' : 'Live'
+    },
+    inv: {
+        name: 'Inventory Database',
+        type: 'Google Apps Script · Google Sheets',
+        purpose: 'Stores inventory items and warehouse data.',
+        endpoint: () => typeof INVENT_CONFIG !== 'undefined' ? (INVENT_CONFIG.GAS_URL || '—') : '—',
+        mode: () => typeof INVENT_CONFIG === 'undefined' || INVENT_CONFIG.isSimulationMode() ? 'Simulation' : 'Live'
+    },
+    gst: {
+        name: 'GST Server',
+        type: 'Google Apps Script · Google Sheets',
+        purpose: 'Manages GST (Goods & Services Tax) billing records and tax computations. Configured via GST-SERVER-MANAGEMENT settings.',
+        endpoint: () => localStorage.getItem(GST_LS_KEY) || (typeof CONFIG !== 'undefined' ? CONFIG.GST_SERVER_URL : '—') || '— Not Configured —',
+        mode: () => (localStorage.getItem(GST_LS_KEY) || (typeof CONFIG !== 'undefined' ? CONFIG.GST_SERVER_URL : '') || '').startsWith('https://') ? 'Live' : 'Not Configured'
+    },
+    wgst: {
+        name: 'WGST Server',
+        type: 'Google Apps Script · Google Sheets',
+        purpose: 'Manages Warehouse GST records and stock movement tax tracking. Configured via WGST-SERVER-MANAGEMENT settings.',
+        endpoint: () => localStorage.getItem(WGST_LS_KEY) || (typeof CONFIG !== 'undefined' ? CONFIG.WGST_SERVER_URL : '—') || '— Not Configured —',
+        mode: () => (localStorage.getItem(WGST_LS_KEY) || (typeof CONFIG !== 'undefined' ? CONFIG.WGST_SERVER_URL : '') || '').startsWith('https://') ? 'Live' : 'Not Configured'
+    }
+};
+
+// ══════════════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    const dataStr = localStorage.getItem('sysadmin_data') || sessionStorage.getItem('sysadmin_data');
+    if (!dataStr) { window.location.replace('sysadmin_login.html'); return; }
+    sysadminData = JSON.parse(dataStr);
+
+    if (!CONFIG.isSimulationMode() && !sysadminData.password) {
+        alert("Session expired. Please log in again.");
+        localStorage.removeItem('sysadmin_data');
+        sessionStorage.removeItem('sysadmin_data');
+        window.location.replace('sysadmin_login.html');
+        return;
+    }
+
+    // Greeting (safely handles absence of 'name' property in sysadmin session data)
+    const greeting = document.getElementById('adminGreeting');
+    if (greeting) {
+        const displayName = sysadminData.name || sysadminData.username || 'System Administrator';
+        greeting.textContent = 'Welcome, ' + displayName;
+    }
+
+    // Initialize Theme button state (defaults to light theme)
+    const savedTheme = localStorage.getItem('sysadmin_theme') || localStorage.getItem('nf_theme') || 'light';
+    updateThemeButton(savedTheme !== 'dark');
+
+    loadReportData();
+    pingAllDbs();
+});
+
+function toggleTheme() {
+    const isLight = document.body.classList.toggle('light-theme');
+    localStorage.setItem('sysadmin_theme', isLight ? 'light' : 'dark');
+    localStorage.setItem('nf_theme', isLight ? 'light' : 'dark');
+    updateThemeButton(isLight);
+}
+
+function updateThemeButton(isLight) {
+    const btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+    btn.innerHTML = isLight ? '☀️ <span class="btn-label">Light</span>' : '🌙 <span class="btn-label">Dark</span>';
+}
+
+// ══════════════════════════════════════════════════════════════════════
+//  VIEW NAVIGATION
+// ══════════════════════════════════════════════════════════════════════
+function openView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    currentView = id;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (id === 'view-overview') buildOverview();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+//  ADMIN REPORTS
+// ══════════════════════════════════════════════════════════════════════
+function loadReportData() {
+    if (!sysadminData.logs) {
+        reportData = [{ role:'Simulation', name:'Demo Admin', username:'admin@demo.com',
+            password:'demo123', timestamp:new Date().toLocaleString(), status:'SUCCESS' }];
+    } else {
+        reportData = [...sysadminData.logs].reverse();
+    }
+    renderReportTable(reportData);
+}
+
+function renderReportTable(data) {
+    const tbody = document.getElementById('reportTableBody');
+    const count = document.getElementById('reportCount');
+    if (count) count.textContent = data.length + ' record' + (data.length !== 1 ? 's' : '');
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:var(--text-muted);">No login records found.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = data.map(row => `
+        <tr>
+            <td><span class="role-badge">${esc(row.role||'Admin')}</span></td>
+            <td><strong>${esc(row.name||'Unknown')}</strong></td>
+            <td class="no-print" style="color:var(--text-muted);">${esc(row.username||'—')}</td>
+            <td class="no-print" style="font-family:monospace;font-size:0.82rem;">${esc(row.password||'—')}</td>
+            <td style="font-size:0.82rem;">${esc(row.timestamp||'—')}</td>
+            <td class="${(row.status||'SUCCESS')==='SUCCESS'?'status-ok':'status-err'}">${esc(row.status||'SUCCESS')}</td>
+            <td class="no-print">
+                <div class="action-set">
+                    <button class="btn-edit-sm" onclick="viewRecord('${esc(row.timestamp)}')">👁</button>
+                    <button class="btn-edit-sm" onclick="openEditModal('${esc(row.timestamp)}')">✏️</button>
+                    <button class="btn-danger-sm" onclick="deleteRecord('${esc(row.timestamp)}')">🗑️</button>
+                </div>
+            </td>
+        </tr>`).join('');
+}
+
+function filterReportTable() {
+    const q = document.getElementById('reportSearch').value.toLowerCase();
+    const filtered = reportData.filter(r =>
+        (r.name||'').toLowerCase().includes(q) ||
+        (r.username||'').toLowerCase().includes(q) ||
+        (r.role||'').toLowerCase().includes(q) ||
+        (r.timestamp||'').toLowerCase().includes(q)
+    );
+    renderReportTable(filtered);
+}
+
+function viewRecord(timestamp) {
+    const row = reportData.find(r => r.timestamp === timestamp);
+    if (!row) return;
+    document.getElementById('viewRecordContent').innerHTML = `
+        <div class="di-row"><span class="di-key">Role</span>      <span class="di-val">${esc(row.role||'Admin')}</span></div>
+        <div class="di-row"><span class="di-key">Admin Name</span><span class="di-val">${esc(row.name||'—')}</span></div>
+        <div class="di-row"><span class="di-key">Username</span>  <span class="di-val">${esc(row.username||'—')}</span></div>
+        <div class="di-row"><span class="di-key">Password</span>  <span class="di-val" style="font-family:monospace;">${esc(row.password||'—')}</span></div>
+        <div class="di-row"><span class="di-key">Timestamp</span> <span class="di-val">${esc(row.timestamp||'—')}</span></div>
+        <div class="di-row"><span class="di-key">Status</span>    <span class="di-val ${(row.status||'SUCCESS')==='SUCCESS'?'status-ok':'status-err'}">${esc(row.status||'SUCCESS')}</span></div>`;
+    document.getElementById('viewModal').classList.add('active');
+}
+
+function openEditModal(timestamp) {
+    const row = reportData.find(r => r.timestamp === timestamp);
+    if (!row) return;
+    document.getElementById('editTimestamp').value = row.timestamp;
+    document.getElementById('editName').value      = row.name || '';
+    document.getElementById('editUsername').value  = row.username || '';
+    document.getElementById('editPassword').value  = row.password || '';
+    document.getElementById('modal-error').style.display = 'none';
+    document.getElementById('editModal').classList.add('active');
+}
+function closeModal() { document.getElementById('editModal').classList.remove('active'); }
+
+document.getElementById('editForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const timestamp   = document.getElementById('editTimestamp').value;
+    const newName     = document.getElementById('editName').value;
+    const newUsername = document.getElementById('editUsername').value;
+    const newPassword = document.getElementById('editPassword').value;
+    const errEl       = document.getElementById('modal-error');
+
+    if (CONFIG.isSimulationMode()) {
+        const row = reportData.find(r => r.timestamp === timestamp);
+        if (row) Object.assign(row, { name:newName, username:newUsername, password:newPassword });
+        closeModal(); renderReportTable(reportData); return;
+    }
+
+    document.getElementById('saveBtnText').style.display    = 'none';
+    document.getElementById('saveBtnSpinner').style.display = 'inline-block';
+    document.getElementById('saveEditBtn').disabled = true;
+
+    try {
+        const fd = new URLSearchParams({ type:'update_log', sys_username:sysadminData.username,
+            sys_password:sysadminData.password, timestamp, newName, newUsername, newPassword });
+        const url = CONFIG.GAS_WEB_APP_URL || CONFIG.GAS_URL;
+        const res = await fetch(url, { method:'POST', body:fd });
+        const j   = await res.json();
+        if (j.status === 'success') {
+            sysadminData.logs = j.data.logs;
+            localStorage.setItem('sysadmin_data', JSON.stringify(sysadminData));
+            sessionStorage.setItem('sysadmin_data', JSON.stringify(sysadminData));
+            closeModal(); loadReportData();
+        } else throw new Error(j.message);
+    } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+    document.getElementById('saveBtnText').style.display    = '';
+    document.getElementById('saveBtnSpinner').style.display = 'none';
+    document.getElementById('saveEditBtn').disabled = false;
+});
+
+async function deleteRecord(timestamp) {
+    if (!confirm("Delete this log record? This cannot be undone.")) return;
+     if (CONFIG.isSimulationMode()) {
+        sysadminData.logs = (sysadminData.logs||[]).filter(r => r.timestamp !== timestamp);
+        localStorage.setItem('sysadmin_data', JSON.stringify(sysadminData));
+        sessionStorage.setItem('sysadmin_data', JSON.stringify(sysadminData));
+        loadReportData(); return;
+    }
+    try {
+        const fd = new URLSearchParams({ type:'delete_log', sys_username:sysadminData.username,
+            sys_password:sysadminData.password, timestamp });
+        const url = CONFIG.GAS_WEB_APP_URL || CONFIG.GAS_URL;
+        const res = await fetch(url, { method:'POST', body:fd });
+        const j   = await res.json();
+        if (j.status === 'success') {
+            sysadminData.logs = j.data.logs;
+            localStorage.setItem('sysadmin_data', JSON.stringify(sysadminData));
+            sessionStorage.setItem('sysadmin_data', JSON.stringify(sysadminData));
+            loadReportData();
+        } else alert("Error: " + j.message);
+    } catch (err) { alert("Error: " + err.message); }
+}
+
+// ── Export ─────────────────────────────────────────────────────────────
+function exportCSV() {
+    if (!reportData.length) return;
+    const headers = ["Role","Admin Name","Username","Password","Login Timestamp","Status"];
+    const rows = reportData.map(r => [r.role||'Admin',r.name||'Unknown',r.username,r.password,r.timestamp,r.status||'SUCCESS']);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const a = Object.assign(document.createElement('a'), { href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})), download:'sysadmin_report.csv' });
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+function exportPDF() {
+    document.getElementById('printDate').textContent = "Generated: " + new Date().toLocaleString();
+    if (window.location.protocol === 'file:') { window.print(); return; }
+    const el = document.getElementById('reportArea');
+    const noPrint = el.querySelectorAll('.no-print');
+    noPrint.forEach(e => e.style.display = 'none');
+    document.querySelector('.print-header').style.display = 'flex';
+    html2pdf().set({ margin:10, filename:'sysadmin_report.pdf',
+        html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4',orientation:'landscape'} })
+        .from(el).save().then(() => {
+            noPrint.forEach(e => e.style.display = '');
+            document.querySelector('.print-header').style.display = 'none';
+        });
+}
+
+// ══════════════════════════════════════════════════════════════════════
+//  DATABASE CONNECTIONS
+// ══════════════════════════════════════════════════════════════════════
+function pingAllDbs() { pingDb('auth'); pingDb('inv'); pingDb('gst'); pingDb('wgst'); }
+function refreshAllDb() { pingAllDbs(); }
+
+async function pingDb(id) {
+    setDbOverviewState(id, 'chk', 'Checking…');
+    DB_STATE[id].state = 'chk';
+
+    if (id === 'auth') {
+        if (typeof CONFIG === 'undefined' || CONFIG.isSimulationMode()) {
+            await delay(900 + Math.random()*300);
+            recordPing(id, 'ok', '✓ Connected (Simulation Mode)', 1);
+        } else {
+            try {
+                const fd = new URLSearchParams({ type:'sysadmin', email:sysadminData?.username||'', password:sysadminData?.password||'' });
+                const url = CONFIG.GAS_WEB_APP_URL || CONFIG.GAS_URL;
+                const j  = await (await fetch(url,{method:'POST',body:fd})).json();
+                if (j.status === 'success') recordPing(id, 'ok', '✓ Connected', (reportData.length||'—'));
+                else recordPing(id, 'err', '✗ ' + j.message, '—');
+            } catch { recordPing(id, 'err', '✗ Unreachable', '—'); }
+        }
+    }
+
+    if (id === 'inv') {
+        if (typeof INVENT_CONFIG === 'undefined' || INVENT_CONFIG.isSimulationMode()) {
+            await delay(700 + Math.random()*400);
+            recordPing(id, 'ok', '✓ Connected (Simulation Mode)', 5);
+        } else {
+            try {
+                const fd = new URLSearchParams({ action:'get_items' });
+                const j  = await (await fetch(INVENT_CONFIG.GAS_URL,{method:'POST',body:fd})).json();
+                if (j.status === 'success') recordPing(id, 'ok', '✓ Connected', (j.data||[]).length);
+                else recordPing(id, 'err', '✗ ' + j.message, '—');
+            } catch { recordPing(id, 'err', '✗ Unreachable', '—'); }
+        }
+    }
+
+    if (id === 'gst') {
+        const gstUrl = localStorage.getItem(GST_LS_KEY) || (typeof CONFIG !== 'undefined' ? CONFIG.GST_SERVER_URL : '') || '';
+        if (!gstUrl || !gstUrl.startsWith('https://')) {
+            // URL not yet configured in GST-SERVER-MANAGEMENT settings
+            await delay(300);
+            recordPing(id, 'err', '✗ Not Configured — Open GST-SERVER-MANAGEMENT → Settings to set GAS URL', '—');
+        } else {
+            try {
+                const res = await Promise.race([
+                    fetch(`${gstUrl}?action=ping`),
+                    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 12000))
+                ]);
+                const j = await res.json();
+                if (j.status === 'success' && j.connected) {
+                    recordPing(id, 'ok', '✓ GST Server Online', j.records || '—');
+                } else {
+                    recordPing(id, 'err', '✗ ' + (j.message || 'GST Server Error'), '—');
+                }
+            } catch (e) {
+                recordPing(id, 'err', e.message === 'timeout' ? '✗ GST Server Timed Out' : '✗ GST Server Unreachable', '—');
+            }
+        }
+    }
+
+    if (id === 'wgst') {
+        const wgstUrl = localStorage.getItem(WGST_LS_KEY) || (typeof CONFIG !== 'undefined' ? CONFIG.WGST_SERVER_URL : '') || '';
+        if (!wgstUrl || !wgstUrl.startsWith('https://')) {
+            // URL not yet configured in WGST-SERVER-MANAGEMENT settings
+            await delay(300);
+            recordPing(id, 'err', '✗ Not Configured — Open WGST-SERVER-MANAGEMENT → Settings to set GAS URL', '—');
+        } else {
+            try {
+                const res = await Promise.race([
+                    fetch(`${wgstUrl}?action=ping`),
+                    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 12000))
+                ]);
+                const j = await res.json();
+                if (j.status === 'success' && j.connected) {
+                    recordPing(id, 'ok', '✓ WGST Server Online', j.records || '—');
+                } else {
+                    recordPing(id, 'err', '✗ ' + (j.message || 'WGST Server Error'), '—');
+                }
+            } catch (e) {
+                recordPing(id, 'err', e.message === 'timeout' ? '✗ WGST Server Timed Out' : '✗ WGST Server Unreachable', '—');
+            }
+        }
+    }
+}
+
+function recordPing(id, state, statusText, records) {
+    const now = new Date().toLocaleTimeString();
+    DB_STATE[id].state   = state;
+    DB_STATE[id].status  = statusText;
+    DB_STATE[id].records = records;
+    DB_STATE[id].time    = now;
+    DB_STATE[id].pings++;
+    DB_STATE[id].log.unshift({ state, msg: statusText, time: now });
+    if (DB_STATE[id].log.length > 10) DB_STATE[id].log.pop();
+
+    setDbOverviewState(id, state, statusText);
+
+    // Update DB detail panel if open
+    if (currentDb === id && document.getElementById('db-detail-panel').style.display !== 'none') {
+        renderDbDetail(id);
+    }
+
+    // Update landing badge
+    updateLandingDbBadge();
+}
+
+function setDbOverviewState(id, state, text) {
+    const card   = document.getElementById('dbOvCard-' + id);
+    const dot    = document.getElementById('dbOvDot-' + id);
+    const status = document.getElementById('dbOvStatus-' + id);
+    if (!card) return;
+    card.className = 'db-ov-card st-' + state;
+    dot.className  = 'db-dot ' + (state==='ok'?'green':state==='err'?'red':'amber');
+    status.className = 'doi-status ' + (state==='ok'?'ok':state==='err'?'err':'chk');
+    status.textContent = text;
+}
+
+function updateLandingDbBadge() {
+    const badge = document.getElementById('dbBadge');
+    if (!badge) return;
+    const ALL_DBS = ['auth','inv','gst','wgst'];
+    const ok  = ALL_DBS.filter(id => DB_STATE[id].state === 'ok').length;
+    const err = ALL_DBS.filter(id => DB_STATE[id].state === 'err').length;
+    if (err > 0) { badge.textContent = err + ' ERROR'; badge.style.background='rgba(255,51,51,0.12)'; badge.style.color='#ff4444'; badge.style.borderColor='rgba(255,51,51,0.3)'; }
+    else if (ok === 4) { badge.textContent = '4/4 ONLINE'; badge.style.background='rgba(76,209,55,0.12)'; badge.style.color='#4cd137'; badge.style.borderColor='rgba(76,209,55,0.3)'; }
+    else if (ok > 0) { badge.textContent = ok + '/4 ONLINE'; badge.style.background='rgba(255,170,0,0.12)'; badge.style.color='#ffaa00'; badge.style.borderColor='rgba(255,170,0,0.3)'; }
+    else { badge.textContent = 'CHECKING…'; }
+}
+
+// ── DB Detail ──────────────────────────────────────────────────────────
+function openDbDetail(id) {
+    currentDb = id;
+    document.getElementById('db-overview-panel').style.display = 'none';
+    document.getElementById('db-detail-panel').style.display   = '';
+    
+    // Config panel for URL configuration
+    const configPanel = document.getElementById('dbConfigPanel');
+    const configInput = document.getElementById('dbConfigUrlInput');
+    
+    if (id === 'gst' || id === 'wgst') {
+        configPanel.style.display = 'block';
+        document.getElementById('dbConfigTitle').innerHTML = `⚙️ Configure ${id === 'gst' ? 'GST' : 'WGST'} Server Connection`;
+        
+        // Load URL from localStorage or fall back to default
+        const key = id === 'gst' ? GST_LS_KEY : WGST_LS_KEY;
+        const fallback = id === 'gst' ? CONFIG.GST_SERVER_URL : CONFIG.WGST_SERVER_URL;
+        configInput.value = localStorage.getItem(key) || fallback || '';
+    } else {
+        configPanel.style.display = 'none';
+    }
+
+    const meta = DB_META[id];
+    document.getElementById('dbBreadcrumb').textContent = meta.name;
+    renderDbDetail(id);
+    pingDb(id); // fresh ping on open
+}
+
+function saveDbConfigUrl() {
+    if (!currentDb) return;
+    const urlInput = document.getElementById('dbConfigUrlInput');
+    const val = (urlInput.value || '').trim();
+    
+    if (!val || !val.startsWith('https://')) {
+        alert('Please enter a valid HTTPS Google Apps Script URL.');
+        return;
+    }
+    
+    const key = currentDb === 'gst' ? GST_LS_KEY : WGST_LS_KEY;
+    localStorage.setItem(key, val);
+    
+    alert('Server URL saved successfully! Testing connection now...');
+    
+    // Re-render and ping
+    renderDbDetail(currentDb);
+    pingDb(currentDb);
+}
+
+function closeDbDetail() {
+    currentDb = null;
+    document.getElementById('db-overview-panel').style.display = '';
+    document.getElementById('db-detail-panel').style.display   = 'none';
+    document.getElementById('dbBreadcrumb').textContent = 'Database Connections';
+}
+
+function renderDbDetail(id) {
+    const st   = DB_STATE[id];
+    const meta = DB_META[id];
+    const dotCls    = st.state==='ok'?'green':st.state==='err'?'red':'amber';
+    const badgeCls  = st.state==='ok'?'ok':st.state==='err'?'err':'chk';
+    const badgeText = st.state==='ok'?'● Online':st.state==='err'?'● Offline':'● Checking…';
+
+    document.getElementById('ddDot').className         = 'detail-hero-dot ' + dotCls;
+    document.getElementById('ddName').textContent      = meta.name;
+    document.getElementById('ddType').textContent      = meta.type;
+    document.getElementById('ddStatusBadge').textContent = badgeText;
+    document.getElementById('ddStatusBadge').className   = 'detail-hero-status ' + badgeCls;
+
+    document.getElementById('ddStat-status').textContent  = st.state === 'ok' ? 'Online' : st.state === 'err' ? 'Offline' : 'Checking…';
+    document.getElementById('ddStat-records').textContent = st.records;
+    document.getElementById('ddStat-time').textContent    = st.time || '—';
+    document.getElementById('ddStat-pings').textContent   = st.pings;
+
+    document.getElementById('ddInfoRows').innerHTML = `
+        <div class="di-row"><span class="di-key">Database Name</span><span class="di-val">${meta.name}</span></div>
+        <div class="di-row"><span class="di-key">Technology</span>  <span class="di-val">${meta.type}</span></div>
+        <div class="di-row"><span class="di-key">Purpose</span>     <span class="di-val">${meta.purpose}</span></div>
+        <div class="di-row"><span class="di-key">Mode</span>        <span class="di-val">${meta.mode()}</span></div>
+        <div class="di-row"><span class="di-key">Endpoint</span>    <span class="di-val" style="font-size:0.75rem;word-break:break-all;">${(meta.endpoint() || '').substring(0,60)}…</span></div>
+        <div class="di-row"><span class="di-key">Current Status</span><span class="di-val ${badgeCls==='ok'?'status-ok':badgeCls==='err'?'status-err':''}">${st.status}</span></div>`;
+
+    const logEl = document.getElementById('ddPingLog');
+    if (st.log.length === 0) {
+        logEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">No pings yet.</div>';
+    } else {
+        logEl.innerHTML = st.log.map(entry => `
+            <div class="ping-entry">
+                <div class="ping-dot ${entry.state==='ok'?'ok':'err'}"></div>
+                <div class="ping-time">${entry.time}</div>
+                <div class="ping-msg" style="color:${entry.state==='ok'?'#4cd137':'#ff4444'}">${entry.msg}</div>
+            </div>`).join('');
+    }
+}
+
+function pingCurrentDb() { if (currentDb) pingDb(currentDb); }
+
+// ══════════════════════════════════════════════════════════════════════
+//  SYSTEM OVERVIEW
+// ══════════════════════════════════════════════════════════════════════
+function buildOverview() {
+    const ALL_DBS    = ['auth','inv','gst','wgst'];
+    const loginCount = reportData.length;
+    const dbOnline   = ALL_DBS.filter(id => DB_STATE[id].state === 'ok').length;
+    const dbErrors   = ALL_DBS.filter(id => DB_STATE[id].state === 'err').length;
+
+    document.getElementById('ovLoginCount').textContent = loginCount;
+    document.getElementById('ovDbOnline').textContent   = dbOnline;
+    document.getElementById('ovDbErrors').textContent   = dbErrors;
+
+    document.getElementById('ovSessionRows').innerHTML = `
+        <div class="di-row"><span class="di-key">Administrator</span><span class="di-val">${esc(sysadminData?.name||'—')}</span></div>
+        <div class="di-row"><span class="di-key">Role</span>         <span class="di-val">${esc(sysadminData?.role||'SysAdmin')}</span></div>
+        <div class="di-row"><span class="di-key">Username</span>     <span class="di-val">${esc(sysadminData?.username||'—')}</span></div>
+        <div class="di-row"><span class="di-key">Session Mode</span> <span class="di-val">${CONFIG.isSimulationMode()?'Simulation':'Live'}</span></div>
+        <div class="di-row"><span class="di-key">Page Loaded</span>  <span class="di-val">${new Date().toLocaleString()}</span></div>`;
+
+    document.getElementById('ovDbSummaryRows').innerHTML = ALL_DBS.map(id => {
+        const st   = DB_STATE[id];
+        const meta = DB_META[id];
+        const cls  = st.state==='ok'?'status-ok':st.state==='err'?'status-err':'';
+        const icon = id==='gst'?'💰':id==='wgst'?'🏭':id==='inv'?'📦':'🔐';
+        return `<div class="di-row">
+            <span class="di-key">${icon} ${meta.name}</span>
+            <span class="di-val ${cls}">${st.status}${st.records !== '—' ? ' · ' + st.records + ' record(s)' : ''}</span>
+        </div>`;
+    }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════════════════
+function doLogout() {
+    localStorage.removeItem('sysadmin_data');
+    sessionStorage.removeItem('sysadmin_data');
+    window.location.replace('sysadmin_login.html');
+}
+function esc(str) {
+    return String(str||'').replace(/[&<>"']/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[t]));
+}
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>

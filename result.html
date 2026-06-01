@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Result - NF Fire</title>
+    <link href="https://script.google.com/macros/s/AKfycbwZ73FRduiSin1t6Yd_xxDR8mYnFacrprUlgCvS7MkZGh9950eRY0j7Q4nEL8Dp7VrK/exec" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="glass-panel">
+            <div class="header">
+                <h1 style="color: #4cd137; background: none; -webkit-text-fill-color: #4cd137;">Success!</h1>
+                <p>Admin authentication successful</p>
+            </div>
+            
+            <div class="password-warning">
+                ⚠️ Note: Displaying passwords is for testing purposes only.
+            </div>
+
+            <div id="results">
+                <!-- Populated by JS -->
+            </div>
+
+            <a href="dashboard.html" class="btn btn-primary" style="margin-top: 2rem;">Proceed to Dashboard ➔</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dataStr = sessionStorage.getItem('admin_data');
+            
+            if (!dataStr) {
+                window.location.href = 'index.html'; // Redirect if no data
+                return;
+            }
+            
+            const data = JSON.parse(dataStr);
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = `
+                <div class="result-group">
+                    <div class="result-label">Name</div>
+                    <div class="result-value">${escapeHTML(data.name)}</div>
+                </div>
+                <div class="result-group">
+                    <div class="result-label">Email</div>
+                    <div class="result-value">${escapeHTML(data.email)}</div>
+                </div>
+                <div class="result-group">
+                    <div class="result-label">Password</div>
+                    <div class="result-value">${escapeHTML(data.password)}</div>
+                </div>
+            `;
+        });
+
+        // Basic XSS protection since we're displaying user input
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+    </script>
+</body>
+</html>
