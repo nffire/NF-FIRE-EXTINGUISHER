@@ -1,0 +1,59 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node dependencies and logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+coverage/
+/.parcel-cache/
+
+# Environment and secrets
+.env
+.env.*.local
+*.secret
+credentials.json
+service_account.json
+secrets.json
+
+# Google Apps Script / clasp
+.clasp.json
+.clasprc.json
+# If you store deployment keys or local clasp settings
+clasp-settings.json
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln
+.project
+.classpath
+.settings/
+
+# Temporary and backup files
+*.bak
+*.tmp
+*.swp
+~*
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+
+# Misc
+/.cache/
+coverage/
+npm-debug.log*
