@@ -1,0 +1,64 @@
+﻿function jsonResponse(payload) {
+  return ContentService.createTextOutput(JSON.stringify(payload))
+                       .setMimeType(ContentService.MimeType.JSON)
+                       .setHeader('Access-Control-Allow-Origin', '*')
+                       .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+                       .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+function doOptions(e) {
+  return jsonResponse({ status: 'ok' });
+}
+
+function doGet(e) {
+  var param = e.parameter || {};
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+
+  if (param.action === 'get') {
+    var searchGstin = (param.gstin || '').toString().toUpperCase().trim();
+
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0].toString().toUpperCase().trim() === searchGstin) {
+        return jsonResponse({
+          status: 'success',
+          data: { name: data[i][1], address: data[i][2] }
+        });
+      }
+    }
+
+    return jsonResponse({ status: 'not_found' });
+  }
+
+  return jsonResponse({ status: 'invalid_request' });
+}
+
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  try {
+    var rawData = e.postData.contents;
+    var parsedData = JSON.parse(rawData);
+
+    if (parsedData.action === 'add') {
+      sheet.appendRow([
+        parsedData.gstin.toString().toUpperCase().trim(),
+        parsedData.name.toString().trim(),
+        parsedData.address.toString().trim()
+      ]);
+
+      return jsonResponse({ status: 'success' });
+    }
+  } catch (err) {
+    if (e.parameter && e.parameter.action === 'add') {
+      sheet.appendRow([
+        e.parameter.gstin,
+        e.parameter.name,
+        e.parameter.address
+      ]);
+      return jsonResponse({ status: 'success' });
+    }
+  }
+
+  return jsonResponse({ status: 'invalid_request' });
+}
