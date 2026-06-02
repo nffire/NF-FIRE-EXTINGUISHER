@@ -20,7 +20,7 @@
 const GAS_API = (function () {
 
   // ─── STORAGE KEY ──────────────────────────────────────────
-  const STORAGE_KEY = 'nffire_wgst_gas_url';
+  const STORAGE_KEY = 'https://script.google.com/macros/s/AKfycbzJz3il8IDkCzyTBISoQhUaw2rt-Ha34WFRlC53lUIG-M19la29rFYcAYCEgVkXIZBkGw/exec';
   
 
   // ─── DEFAULT URL (leave blank; configure via Settings UI) ─
