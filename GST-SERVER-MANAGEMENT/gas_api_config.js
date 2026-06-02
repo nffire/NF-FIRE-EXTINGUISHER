@@ -20,10 +20,10 @@
 const GAS_API = (function () {
 
   // ─── STORAGE KEY ──────────────────────────────────────────
-  const STORAGE_KEY = 'nffire_gst_gas_url';
+  const STORAGE_KEY = 'https://script.google.com/macros/s/AKfycbygnpuU6tzp1gaUDYKsbtIGYsBZ4BWm5qmMx04vxoe5aQCxmWvl3mwZxCnQsCX_74MLKA/exec';
 
   // ─── DEFAULT URL (leave blank; configure via Settings UI) ─
-  const DEFAULT_GAS_URL = '';
+  const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbygnpuU6tzp1gaUDYKsbtIGYsBZ4BWm5qmMx04vxoe5aQCxmWvl3mwZxCnQsCX_74MLKA/exec';
 
   // ─── SHEETS / TABS defined in gas_admin_backend.gs ────────
   const SHEETS = {
